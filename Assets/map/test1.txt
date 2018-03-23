@@ -1,0 +1,14 @@
+/Users/eastevil/Desktop/Game-Engine/Assignment2/assignment-2/assignment-2-platformer-popeyes/project/Assets/map/test1.png
+/Users/eastevil/Desktop/Game-Engine/Assignment2/assignment-2/assignment-2-platformer-popeyes/project/Assets/map/tile1.png
+24
+24
+20
+8
+1 2 2 2 2 1 2 2 2 2 2 2 1 2 2 2 2 2 1 2
+2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 1 2 2 2
+2 1 2 2 2 2 2 2 2 2 0 0 2 2 2 2 2 2 1 2
+2 2 2 2 2 0 0 0 0 2 2 2 2 2 2 2 2 2 2 2
+2 2 2 2 2 2 2 2 2 2 2 2 0 0 0 2 2 2 2 2
+2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
