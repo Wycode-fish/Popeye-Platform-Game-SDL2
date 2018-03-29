@@ -100,8 +100,8 @@ void LButton::render( LTexture* gButtonSpriteSheetTexture, SDL_Renderer* rendere
     SDL_Rect buttonSize;
     buttonSize.x = 0;
     buttonSize.y = 0;
-    buttonSize.w = BUTTON_SIZE_X;
-    buttonSize.h = BUTTON_SIZE_Y;
+    buttonSize.w = BUTTON_WIDTH;
+    buttonSize.h = BUTTON_HEIGHT;
     gButtonSpriteSheetTexture->render( mPosition.x, mPosition.y, renderer, &clip, &buttonSize );
 }
 

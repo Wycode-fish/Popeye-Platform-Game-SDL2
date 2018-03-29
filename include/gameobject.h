@@ -104,6 +104,10 @@ public:
 
     int         getPowerCode();
 
+    int         getLastPowerTime();
+
+    void        setLastPowerTime(int t);
+
     Vector2D    getMaxVelocity();
 
     void        setMaxVelocity(Vector2D v);
@@ -148,6 +152,8 @@ protected:
 
     /* powerCode of Game Object*/
     int             powerCode = POWERUP_CODE_NONE;
+
+    int             lastPowerTime = 0;
 
     bool            isFloat = false;
 };
@@ -225,6 +231,15 @@ inline void GameObject::setPowerCode (int c) {
 inline int GameObject::getPowerCode () {
     return powerCode;
 }
+
+inline void GameObject::setLastPowerTime (int t) {
+    lastPowerTime = t;
+}
+
+inline int GameObject::getLastPowerTime () {
+    return lastPowerTime;
+}
+
 
 inline Vector2D GameObject::getMaxVelocity() {
     return maxVelocity;

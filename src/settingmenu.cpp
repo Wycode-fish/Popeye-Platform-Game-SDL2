@@ -99,21 +99,28 @@ void SettingMenu::show(){
                 break;
             }
         }
+        render();
+    }
+}
 
-        SDL_SetRenderDrawColor(gRenderer, 0x22,0x22,0x22,0xFF);
-        SDL_RenderClear(gRenderer);
+void SettingMenu::render(){
+    SDL_SetRenderDrawColor(gRenderer, 0x22,0x22,0x22,0xFF);
+    SDL_RenderClear(gRenderer);
 
-        for (std::map<std::string, LButton*>::iterator it = buttons.begin();
-             it != buttons.end();
-             it++){
-            LButton* renderButton = it->second;
-            renderButton->render( gSettingMenuButtonSpriteSheet, gRenderer, gSpriteClips[ renderButton->getCurrentSprite() ] );
-        }
+    renderButtons();
 
-        renderLabels();
+    renderLabels();
 
 
-        SDL_RenderPresent( gRenderer );
+    SDL_RenderPresent( gRenderer );
+}
+
+void SettingMenu::renderButtons(){
+    for (std::map<std::string, LButton*>::iterator it = buttons.begin();
+         it != buttons.end();
+         it++){
+        LButton* renderButton = it->second;
+        renderButton->render( gSettingMenuButtonSpriteSheet, gRenderer, gSpriteClips[ renderButton->getCurrentSprite() ] );
     }
 }
 

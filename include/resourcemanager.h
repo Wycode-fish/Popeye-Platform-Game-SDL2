@@ -20,6 +20,10 @@
 #include "constants.h"
 #include "ltexture.h"
 #include "system.h"
+#include "tilemapsystem.h"
+#include <unistd.h>
+//#include <QApplication>
+
 
 using namespace std;
 
@@ -89,6 +93,8 @@ public:
      */
     bool loadChunkResource( const char* path, std::string key_name );
 
+    bool loadTileMapResource();
+
     /**
      * @brief Get the texture resource from a texture map
      *
@@ -131,6 +137,9 @@ public:
      * @brief Load language resource
      */
     bool loadLanguageResource();
+
+    string getCurrentWorkingDirectory();
+
 
 
 private:

@@ -3,7 +3,6 @@
 
 
 #include "tile.h"
-#include "camera.h"
 #include <vector>
 #include <iostream>
 
@@ -23,6 +22,11 @@ public:
     void setMapHeight( int mapHeight );
     void setTileHeight( int tileHeight );
     void setTileWidth( int tileWidth );
+    void setSpecialAccEffect( Vector2D specialAccEffect );
+    void setSpecialLifeEffect( int specialLifeEffect );
+    void setInputFactorEffect( Vector2D inputFactorEffect );
+    void setCheckPointList( vector<Vector2D> checkPointList );
+    void setPassPoint( Vector2D passPoint );
     int getMapId();
     Tile* tileAtPos( Vector2D pos );
     Tile* tileAtLeftPos( Vector2D pos );
@@ -32,7 +36,16 @@ public:
     vector<Tile*> tileAtVerticalPos( Vector2D pos );
     vector<Tile*> tileAtHorizontalPos( Vector2D pos );
     Tile* getTile( int tileId );
+    Vector2D getSpecialAccEffect( );
+    Vector2D getInputFactorEffect();
+    int getSpecialLifeEffect();
     int getMapType();
+    int getTileWidth();
+    int getTileHeight();
+    int getWidth();
+    int getHeight();
+    vector<Vector2D> getCheckPointList();
+    Vector2D getPassPoint();
 private:
     vector<Tile*> tileList;
     int mapId;
@@ -41,6 +54,11 @@ private:
     int tileWidth; // in pixel
     int tileHeight; // in pixel
     int typeId;
+    Vector2D specialAccEffect; // the special Effect to accleration factors in each map
+    int specialLifeEffect; //  the special Effect to life factor in each map
+    Vector2D inputFactorEffect; // the input factor effect in each map
+    vector<Vector2D> checkPointList;
+    Vector2D passPoint;
 };
 
 #endif // TILEMAP_H

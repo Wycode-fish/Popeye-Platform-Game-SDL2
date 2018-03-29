@@ -125,7 +125,7 @@ void LTexture::render( int x, int y, SDL_Renderer* gRenderer, SDL_Rect* clip, SD
     //Set rendering space and render to screen
     SDL_Rect renderQuad = { x, y, mWidth, mHeight };
 
-    cout << "Width : " << mWidth << " Height : " << mHeight << endl;
+    //cout << "Width : " << mWidth << " Height : " << mHeight << endl;
 
     if (!mTexture)
         cout << "Texture is Null!\n";

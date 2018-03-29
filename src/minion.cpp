@@ -7,6 +7,7 @@ Minion::Minion(): Collider( this ){
     this->setMass( MINION_MASS );
     this->setVelocity(Vector2D(MINION_INITIAL_VELOCITY_X, 0.0f));
     this->animationControl->setMaxFrames(MINION_ANIMATION_MAX_FRAME_NUM);
+    this->setMaxVelocity(Vector2D( MINION_INITIAL_VELOCITY_X,MAX_VELOCITY_Y));
     this->setBoundingBox( Vector2D( MINION_BOUNDING_BOX_X, MINION_BOUNDING_BOX_Y ) );
 }
 
@@ -18,6 +19,7 @@ Minion::Minion(Vector2D pos, Vector2D vel): Collider(this){
     this->setPosition(pos);
     this->setVelocity(vel);
     this->animationControl->setMaxFrames(MINION_ANIMATION_MAX_FRAME_NUM);
+    this->setMaxVelocity(Vector2D( MINION_INITIAL_VELOCITY_X,MAX_VELOCITY_Y));
     this->setBoundingBox( Vector2D( MINION_BOUNDING_BOX_X, MINION_BOUNDING_BOX_Y ) );
 }
 

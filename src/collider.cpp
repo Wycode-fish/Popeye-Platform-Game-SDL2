@@ -25,11 +25,11 @@ bool Collider::onCollide (Collider* c) {
     Vector2D bColliderPos = c->getGameObject()->getPosition();
     Vector2D bColliderBoundingBox = c->getBoundingBox();
 
-    cout << "A Collider Pos : " << aColliderPos[0] << " " << aColliderPos[1] << endl;
-    cout << "B Collider Pos : " << bColliderPos[0] << " " << bColliderPos[1] << endl;
+//    cout << "A Collider Pos : " << aColliderPos[0] << " " << aColliderPos[1] << endl;
+//    cout << "B Collider Pos : " << bColliderPos[0] << " " << bColliderPos[1] << endl;
 
-    cout << "A Collider B-Box : " << aColliderBoundingBox[0] << " " << aColliderBoundingBox[1] << endl;
-    cout << "B Collider B-Box : " << bColliderBoundingBox[0] << " " << bColliderBoundingBox[1] << endl;
+//    cout << "A Collider B-Box : " << aColliderBoundingBox[0] << " " << aColliderBoundingBox[1] << endl;
+//    cout << "B Collider B-Box : " << bColliderBoundingBox[0] << " " << bColliderBoundingBox[1] << endl;
 
     float aLeft = aColliderPos[0] - aColliderBoundingBox[0] / 2.0;
     float aRight = aColliderPos[0] + aColliderBoundingBox[0] / 2.0;

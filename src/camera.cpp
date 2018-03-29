@@ -78,16 +78,21 @@ void Camera::update() {
 
     Vector2D heroPos = GameSetting::getInstance()->getHero()->getPosition();
 
+    TileMap* currentMap = TileMapSystem::getInstance()->getTileMap( TileMapSystem::getInstance()->getCurrentMapId() );
+
+    int mapWidth = currentMap->getWidth() * currentMap->getTileWidth();
+    int mapHeight = currentMap->getHeight() * currentMap->getTileHeight();
+
     float offX = heroPos[0]-CAMERA_OFFSET_FROM_HERO_X;
     float offY = heroPos[1]-CAMERA_OFFSET_FROM_HERO_Y;
     if (offX <= 0.0f)
         offX = 0.0f;
     if (offY <= 0.0f)
         offY = 0.0f;
-    if (offX >= MAP_WIDTH - WINDOW_WIDTH)
-        offX = MAP_WIDTH - WINDOW_WIDTH;
-    if (offY >= MAP_HEIGHT - WINDOW_HEIGHT)
-        offY = MAP_HEIGHT - WINDOW_HEIGHT;
+    if (offX >= mapWidth - WINDOW_WIDTH)
+        offX = mapWidth - WINDOW_WIDTH;
+    if (offY >= mapHeight - WINDOW_HEIGHT)
+        offY = mapHeight - WINDOW_HEIGHT;
     Vector2D cPos = Vector2D(offX, offY);
 
     setCameraPos(cPos);

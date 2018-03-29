@@ -12,9 +12,13 @@
 #include "powerup.h"
 #include "bullet.h"
 #include "system.h"
+#include "tilemapsystem.h"
+#include "collectible.h"
 #include <map>
 #include <stddef.h>
 #include <string>
+//#include <QApplication>
+//#include <QString>
 
 using namespace std;
 /**
@@ -72,12 +76,18 @@ public:
     bool initPowerUps();
     // load PowerUp
     bool loadPowerUpPosition();
+
+    bool loadHeroPosition();
+
     /**
      * @brief Init level info
      */
     bool initMinions();
 
     bool initBullets();
+
+    bool initHero();
+
 
     // // InitLevelOne
     // bool initLevelOne();
@@ -112,7 +122,7 @@ public:
      */
     void setLife( int life );
     // set Score
-    //void setScore( long int score );
+    void setScore( long int score );
 
     /**
      * @brief Get current level
@@ -123,7 +133,7 @@ public:
      */
     int getLife();
     // get Score
-    //long int getScore();
+    long int getScore();
 
     /**
      * @brief Reset score to default
@@ -140,7 +150,7 @@ public:
     /**
      * @brief Reset ball to original state
      */
-    void resetHero();
+    void resetHero(Vector2D checkPoint = Vector2D(HERO_INITIAL_POSITION_X, HERO_INITIAL_POSITION_Y));
 
     void reset();
 
@@ -170,6 +180,22 @@ public:
 
     void                    removeDeadMinions();
 
+public:
+
+    bool                    loadCollectiblePosition();
+
+    bool                    initCollectibles();
+
+    vector<Collectible*>    getCollectibles();
+
+    void                    removeDeadCollectibles();
+
+public:
+
+    void                    initNextLevel();
+
+    void                    initCurrentLevel();
+
 private:
     /**
      * @brief Private constructor
@@ -184,13 +210,16 @@ private:
     int level; /**< the Level in the game */
 
     // the Score in the game
-    //long int score;
+    long int score = 0;
 
     int life; /**< the Life in the game */
 
     vector<Vector2D> minionPositions; /**< the vector of minion position */
 
     vector<Vector2D> powerUpPositions; // the vector of the powerUp position
+
+    vector<Vector2D> collectiblePositions;
+
 
 
 private:
@@ -202,6 +231,9 @@ private:
     vector<PowerUp*> powerUps;
 
     vector<Bullet*> bullets;
+
+    vector<Collectible*> collectibles;
+
 
     //vector<Wall*> boundary; /**< the Boundary in the game */
 

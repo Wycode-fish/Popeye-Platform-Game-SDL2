@@ -5,6 +5,8 @@
 #include "ltexture.h"
 #include "constants.h"
 #include "resourcemanager.h"
+#include "instructionmenu.h"
+#include "settingmenu.h"
 #include "menu.h"
 #include <sstream>
 #include <iostream>
@@ -32,7 +34,11 @@ public:
 
     virtual void destroy();
 
+    virtual void render();
+
     bool init( SDL_Renderer* gRenderer );
+
+    void renderButtons();
 
     void renderLabels();
 

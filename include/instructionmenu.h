@@ -32,9 +32,13 @@ public:
 
     virtual void destroy();
 
+    virtual void render();
+
     bool init( SDL_Renderer* gRenderer );
 
     void renderLabels();
+
+    void renderButtons();
 
 private:
 

@@ -30,12 +30,19 @@ TileMapSystem::~TileMapSystem(){
     }
 }
 
-bool TileMapSystem::onLoad( const string& fileName, vector<int> groundIndexSet, int mapType ){
+bool TileMapSystem::onLoad( const string& fileName, vector<int> groundIndexSet, vector<int> specialIndexSet, int mapType,
+                            Vector2D specialAccEffect,
+                            Vector2D inputFactorEffect,
+                            int specialLifeEffect,
+                            vector<int> checkPointList,
+                            Vector2D passPoint ){
     bool success = true;
 
     int currentId = tileMapList.size();
 
-    fstream inFile;
+    vector<Vector2D> checkPointVec;
+
+    ifstream inFile;
     string imagePath = "";
     string tilePath = "";
     int width = 0;
@@ -44,12 +51,17 @@ bool TileMapSystem::onLoad( const string& fileName, vector<int> groundIndexSet, 
     int tileHeight = 0;
     inFile.open(fileName);
     if(!inFile){
+        char path[2000];
+        getcwd(path, sizeof(path));
+        string str(path);
         cout << "Unable to open file : " << fileName << endl;
+        cout << "Current Work Directory !\n" << path << endl;
+        cerr << "Error: " << strerror(errno);
         return false;
     }
     // First, read the map image path
-    inFile >> imagePath;
-    inFile >> tilePath;
+    getline(inFile, imagePath);
+    getline(inFile, tilePath);
     inFile >> tileWidth;
     inFile >> tileHeight;
     inFile >> width;
@@ -67,6 +79,10 @@ bool TileMapSystem::onLoad( const string& fileName, vector<int> groundIndexSet, 
     tileMap->setMapHeight( height );
     tileMap->setTileWidth( tileWidth );
     tileMap->setTileHeight( tileHeight );
+    tileMap->setSpecialAccEffect( specialAccEffect );
+    tileMap->setInputFactorEffect( inputFactorEffect );
+    tileMap->setSpecialLifeEffect( specialLifeEffect );
+    tileMap->setPassPoint( passPoint );
     while(!inFile.eof()){
         int index = 0;
         inFile >> index;
@@ -85,40 +101,46 @@ bool TileMapSystem::onLoad( const string& fileName, vector<int> groundIndexSet, 
         tile->setPosition( Vector2D( tilePosX, tilePosY ) );
         // set tile type
         bool isGround = false;
+        bool isSpecial = false;
+        bool isCheckPoint = false;
         for (int i = 0; i < groundIndexSet.size(); i++){
             if ( groundIndexSet[i] == index ){
                 isGround = true;
                 break;
             }
         }
-//        cout << "Ground Index Set : \n";
-//        for (int i = 0; i < groundIndexSet.size(); i++){
-//            cout << groundIndexSet[i] << endl;
-//        }
-        if ( isGround ){
-            //tile->setTileType( TILE_TYPE_SURFACE );
-            switch (mapType) {
-                case MAP_TYPE_NORMAL:
-                    tile->setTileType( TILE_TYPE_SURFACE );
-                    tile->setTag( "TILE_TYPE_SURFACE" );
-                    break;
-                case MAP_TYPE_SEA:
-                    tile->setTileType( TILE_TYPE_WATER );
-                    tile->setTag( "TILE_TYPE_WATER" );
-                    break;
-                case MAP_TYPE_SNOW:
-                    tile->setTileType( TILE_TYPE_ICE );
-                    tile->setTag( "TILE_TYPE_ICE" );
-                    break;
-                default:
-                    break;
+
+        for (int i = 0; i < specialIndexSet.size(); i++){
+            if ( specialIndexSet[i] == index ){
+                isSpecial = true;
+                break;
             }
         }
-        else{
+
+        for (int i = 0; i < checkPointList.size(); i++){
+            if ( checkPointList[i] == index ){
+                isCheckPoint = true;
+                break;
+            }
+        }
+
+        if ( isGround ){
+            tile->setTileType( TILE_TYPE_SURFACE );
+            tile->setTag( "TILE_TYPE_SURFACE" );
+        } else if (isSpecial){
+            tile->setTileType( TILE_TYPE_SPECIAL );
+            tile->setTag( "TILE_TYPE_SPECIAL" );
+        } else if (isCheckPoint){
             tile->setTileType( TILE_TYPE_BASIC );
+            tile->setTag( "TILE_TYPE_BASIC" );
+            checkPointVec.push_back( Vector2D( tile->getPosition()[0], tile->getPosition()[1] ) );
+        } else {
+            tile->setTileType( TILE_TYPE_BASIC );
+            tile->setTag( "TILE_TYPE_BASIC" );
         }
         tileMap->addTile(tile);
     }
+    tileMap->setCheckPointList(checkPointVec);
     tileMapList.push_back( tileMap );
     // cout << "Read TileMap Size From File : " << tileMap.size() << endl;
 

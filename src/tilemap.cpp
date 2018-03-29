@@ -7,7 +7,7 @@
 
 #include "../include/tilemap.h"
 
-TileMap::TileMap(){
+TileMap::TileMap() : mapId(-1), mapWidth(0), mapHeight(0), tileWidth(0), tileHeight(0), typeId(-1), specialAccEffect(Vector2D(0.0f, 0.0f)), specialLifeEffect(0) {
 
 }
 
@@ -64,7 +64,7 @@ int TileMap::getMapType(){
 
 Tile* TileMap::tileAtLeftPos( Vector2D pos ){// pos is the object Pos in map coordinate
     // return the closet tile under the hero position
-    Vector2D cameraPos = Camera::getInstance()->getCameraPos(); // the camera position, relative to map, in the left-top corner
+    //Vector2D cameraPos = Camera::getInstance()->getCameraPos(); // the camera position, relative to map, in the left-top corner
     Vector2D heroPos = pos; // the hero position, relative to window coordinate
     Vector2D heroIndex = Vector2D( heroPos[0] / tileWidth , heroPos[1] / tileHeight );
     int tileId = floor(heroIndex[0]) + floor(heroIndex[1]) * mapWidth - 1;
@@ -73,7 +73,7 @@ Tile* TileMap::tileAtLeftPos( Vector2D pos ){// pos is the object Pos in map coo
 
 Tile* TileMap::tileAtRightPos( Vector2D pos ){// pos is the object Pos in map coordinate
     // return the closet tile under the hero position
-    Vector2D cameraPos = Camera::getInstance()->getCameraPos(); // the camera position, relative to map, in the left-top corner
+    //Vector2D cameraPos = Camera::getInstance()->getCameraPos(); // the camera position, relative to map, in the left-top corner
     Vector2D heroPos = pos; // the hero position, relative to window coordinate
     Vector2D heroIndex = Vector2D( heroPos[0] / tileWidth , heroPos[1] / tileHeight );
     int tileId = floor(heroIndex[0]) + floor(heroIndex[1]) * mapWidth + 1;
@@ -82,7 +82,7 @@ Tile* TileMap::tileAtRightPos( Vector2D pos ){// pos is the object Pos in map co
 
 Tile* TileMap::tileAtUpPos( Vector2D pos ){// pos is the object Pos in map coordinate
     // return the closet tile under the hero position
-    Vector2D cameraPos = Camera::getInstance()->getCameraPos(); // the camera position, relative to map, in the left-top corner
+    //Vector2D cameraPos = Camera::getInstance()->getCameraPos(); // the camera position, relative to map, in the left-top corner
     Vector2D heroPos = pos; // the hero position, relative to window coordinate
     Vector2D heroIndex = Vector2D( heroPos[0] / tileWidth , heroPos[1] / tileHeight );
     int tileId = floor(heroIndex[0]) + floor( (heroIndex[1] - 1) ) * mapWidth;
@@ -91,7 +91,7 @@ Tile* TileMap::tileAtUpPos( Vector2D pos ){// pos is the object Pos in map coord
 
 Tile* TileMap::tileAtDownPos( Vector2D pos ){// pos is the object Pos in map coordinate
     // return the closet tile under the hero position
-    Vector2D cameraPos = Camera::getInstance()->getCameraPos(); // the camera position, relative to map, in the left-top corner
+    //Vector2D cameraPos = Camera::getInstance()->getCameraPos(); // the camera position, relative to map, in the left-top corner
     Vector2D heroPos = pos; // the hero position, relative to window coordinate
     Vector2D heroIndex = Vector2D( heroPos[0] / tileWidth , heroPos[1] / tileHeight );
     int tileId = floor(heroIndex[0]) + floor( (heroIndex[1] + 1) ) * mapWidth;
@@ -151,6 +151,14 @@ Tile* TileMap::getTile( int tileId ){
     return tileList[tileId];
 }
 
+Vector2D TileMap::getSpecialAccEffect(){
+    return specialAccEffect;
+}
+
+int TileMap::getSpecialLifeEffect(){
+    return specialLifeEffect;
+}
+
 void TileMap::setMapWidth( int mapWidth ){
     this->mapWidth = mapWidth;
 }
@@ -166,3 +174,54 @@ void TileMap::setTileHeight( int tileHeight ){
 void TileMap::setTileWidth( int tileWidth ){
     this->tileWidth = tileWidth;
 }
+
+void TileMap::setSpecialAccEffect(Vector2D specialAccEffect){
+    this->specialAccEffect = specialAccEffect;
+}
+
+void TileMap::setSpecialLifeEffect(int specialLifeEffect){
+    this->specialLifeEffect = specialLifeEffect;
+}
+
+void TileMap::setCheckPointList( vector<Vector2D> checkPointList ){
+    this->checkPointList.assign(checkPointList.begin(), checkPointList.end());
+}
+
+
+int TileMap::getHeight(){
+    return mapHeight;
+}
+
+int TileMap::getWidth(){
+    return mapWidth;
+}
+
+int TileMap::getTileWidth(){
+    return tileWidth;
+}
+
+int TileMap::getTileHeight(){
+    return tileHeight;
+}
+
+vector<Vector2D> TileMap::getCheckPointList(){
+    return checkPointList;
+}
+
+void TileMap::setInputFactorEffect( Vector2D inputFactorEffect ){
+    this->inputFactorEffect = inputFactorEffect;
+}
+
+Vector2D TileMap::getInputFactorEffect(){
+    return inputFactorEffect;
+}
+
+Vector2D TileMap::getPassPoint(){
+    return passPoint;
+}
+
+void TileMap::setPassPoint( Vector2D passPoint ){
+    this->passPoint = passPoint;
+}
+
+

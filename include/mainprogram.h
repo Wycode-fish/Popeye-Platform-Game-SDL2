@@ -16,6 +16,7 @@
 #include "hero.h"
 #include "ltimer.h"
 #include "resourcemanager.h"
+#include "soundsystem.h"
 // This class represents the mainprogram
 // Singleton design pattern
 class MainProgram{
@@ -28,7 +29,6 @@ private:
     static MainProgram* gMainProgram;
     MainProgram();
     bool init();
-    string getCurrentWorkingDirectory();
     void loop();
     float screenTickPerFrame = 1.0 / FPS;
 };

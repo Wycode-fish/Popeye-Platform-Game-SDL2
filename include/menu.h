@@ -21,6 +21,8 @@ public:
 
     virtual void destroy()=0;
 
+    virtual void render()=0;
+
 };
 
 #endif // MENU_H

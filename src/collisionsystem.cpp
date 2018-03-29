@@ -47,6 +47,9 @@ void CollisionSystem::collectCollisions() {
     collectMinionBulletCol();
 
     collectBulletGroundCol();
+
+    collectHeroCollectibleCol();
+
 }
 
 
@@ -68,22 +71,18 @@ void CollisionSystem::update(){
                 break;
 
             /****** Hero Collision ******/
-            case COLLISION_TYPE_HERO_SURFACE :       // COLLISION_TYPE_HERO_GROUND          2
-                cout<<"--------- surface."<<endl;
-                colHeroGround( colQueue[i] );
-                break;
 
             case COLLISION_TYPE_HERO_BASIC :       // COLLISION_TYPE_HERO_GROUND          2
                 break;
 
-            case COLLISION_TYPE_HERO_ICE :       // COLLISION_TYPE_HERO_GROUND          2
-                colHeroIce( colQueue[i] );
+            case COLLISION_TYPE_HERO_SPECIAL :       // COLLISION_TYPE_HERO_GROUND          2
+                colHeroSpecial( colQueue[i] );
                 break;
 
-            case COLLISION_TYPE_HERO_WATER :       // COLLISION_TYPE_HERO_GROUND          2
-                colHeroWater( colQueue[i] );
+            case COLLISION_TYPE_HERO_SURFACE :       // COLLISION_TYPE_HERO_GROUND          2
+                cout<<"--------- surface."<<endl;
+                colHeroGround( colQueue[i] );
                 break;
-
 
             /****** Minion Collision ******/
             case COLLISION_TYPE_MINION_BASIC :
@@ -94,12 +93,8 @@ void CollisionSystem::update(){
                 colMinionGround( colQueue[i] );
                 break;
 
-            case COLLISION_TYPE_MINION_WATER :
-                colMinionWater( colQueue[i] );
-                break;
-
-            case COLLISION_TYPE_MINION_ICE :
-                colMinionIce( colQueue[i] );
+            case COLLISION_TYPE_MINION_SPECIAL :
+                colMinionSpecial( colQueue[i] );
                 break;
 
             case COLLISION_TYPE_MINION_MINION :
@@ -116,12 +111,8 @@ void CollisionSystem::update(){
                 colPowerUpGround( colQueue[i] );
                 break;
 
-            case COLLISION_TYPE_POWERUP_ICE :
-                colPowerUpGround( colQueue[i] );
-                break;
-
-            case COLLISION_TYPE_POWERUP_WATER :
-                colPowerUpGround( colQueue[i] );
+            case COLLISION_TYPE_POWERUP_SPECIAL :
+                colPowerUpSpecial( colQueue[i] );
                 break;
 
             case COLLISION_TYPE_POWERUP_BASIC :
@@ -133,12 +124,8 @@ void CollisionSystem::update(){
                 colMinionBullet ( colQueue[i] );
                 break;
 
-            case COLLISION_TYPE_BULLET_ICE :
-                colBulletGround ( colQueue[i] );
-                break;
-
-            case COLLISION_TYPE_BULLET_WATER :
-                colBulletGround ( colQueue[i] );
+            case COLLISION_TYPE_BULLET_SPECIAL :
+                colBulletSpecial ( colQueue[i] );
                 break;
 
             case COLLISION_TYPE_BULLET_SURFACE :
@@ -146,7 +133,12 @@ void CollisionSystem::update(){
                 break;
 
             case COLLISION_TYPE_BULLET_HERO :
-                colBulletGround ( colQueue[i] );
+                colBulletHero ( colQueue[i] );
+                break;
+
+            /****** Collectible Collision ******/
+            case COLLISION_TYPE_HERO_COLLECTIBLE :
+                colHeroCollectible ( colQueue[i] );
                 break;
 
 
@@ -161,6 +153,26 @@ void CollisionSystem::update(){
 
 
 /*************************.    Collision Update Helper Function  *************************/
+void CollisionSystem::colHeroCollectible(Collision* c) {
+
+
+    Collider* a = c->getColliderA();
+    Collider* b = c->getColliderB();
+
+
+    Collider* cHero = (a->getGameObject()->getTag() == "Hero") ? a : b;
+    Collider* cCollectible = (a->getGameObject()->getTag() == "Collectible") ? a : b;
+
+    // Collision Effect
+    // cHero->getGameObject()->setLastPowerTime(SDL_GetTicks());
+    // cHero->getGameObject()->setPowerCode(cPowerUp->getGameObject()->getPowerCode());
+
+    if (!cCollectible->getIsCol()) {          // If powerup is collision valid
+        cCollectible->setIsCol(true);
+        cCollectible->setLastColTime(SDL_GetTicks());
+    }
+}
+
 void CollisionSystem::colHeroMinion(Collision* c) {
 
     cout<<"collision: hero <-> minion"<<endl;
@@ -196,17 +208,7 @@ void CollisionSystem::colHeroGround(Collision* c) {
     Collider* cHero = (a->getGameObject()->getTag()=="Hero")?a:b;
     Collider* cTile = (a->getGameObject()->getTag()=="Hero")?b:a;
 
-    Vector2D* input = ControlSystem::getInstance()->getInputs(GameSetting::getInstance()->getPlayerNum()-1);
-
-    if (c->getColDir()==Vector2D(1.0f, 0.0f)){
-
-        colHeroBlockRight(cHero, input);
-    }
-
-    if (c->getColDir()==Vector2D(-1.0f, 0.0f)){
-
-        colHeroBlockLeft(cHero, input);
-    }
+    Vector2D* input = ControlSystem::getInstance()->translateInput(GameSetting::getInstance()->getPlayerNum()-1);
 
     if (c->getColDir()==Vector2D(0.0f, 1.0f)){
 
@@ -217,15 +219,61 @@ void CollisionSystem::colHeroGround(Collision* c) {
 
         colHeroBlockUp(cHero, input);
     }
+    if (c->getColDir()==Vector2D(1.0f, 0.0f)){
+
+        colHeroBlockRight(cHero, input);
+    }
+
+    if (c->getColDir()==Vector2D(-1.0f, 0.0f)){
+
+        colHeroBlockLeft(cHero, input);
+    }
+
+
 }
 
-void CollisionSystem::colHeroWater(Collision* c) {
-    return;
+void CollisionSystem::colHeroSpecial(Collision* c){
+    cout<<"collision: hero <-> special"<<endl;
+
+    Collider* a = c->getColliderA();
+    Collider* b = c->getColliderB();
+
+    Collider* cHero = (a->getGameObject()->getTag()=="Hero")?a:b;
+    Collider* cTile = (a->getGameObject()->getTag()=="Hero")?b:a;
+
+    Vector2D* input = ControlSystem::getInstance()->translateInput(GameSetting::getInstance()->getPlayerNum()-1);
+
+    if (c->getColDir()==Vector2D(0.0f, 1.0f)){
+
+        colHeroSpecialBlockDown(cHero, input);
+    }
+
+    if (c->getColDir()==Vector2D(0.0f, -1.0f)){
+
+        colHeroSpecialBlockUp(cHero, input);
+    }
+
+    if (c->getColDir()==Vector2D(1.0f, 0.0f)){
+
+        colHeroSpecialBlockRight(cHero, input);
+    }
+
+    if (c->getColDir()==Vector2D(-1.0f, 0.0f)){
+
+        colHeroSpecialBlockLeft(cHero, input);
+    }
+
+
 }
 
-void CollisionSystem::colHeroIce(Collision* c) {
-    return;
-}
+//void CollisionSystem::colHeroWater(Collision* c) {
+//    return;
+//}
+
+//void CollisionSystem::colHeroIce(Collision* c) {
+//    return;
+//}
+
 
 
 void CollisionSystem::colMinionGround(Collision* c) {
@@ -239,35 +287,173 @@ void CollisionSystem::colMinionGround(Collision* c) {
     Collider* cMinion = (a->getGameObject()->getTag()=="Minion")?a:b;
     Collider* cTile = (a->getGameObject()->getTag()=="Minion")?b:a;
 
-    if (c->getColDir()==Vector2D(1.0f, 0.0f) || c->getColDir()==Vector2D(-1.0f, 0.0f)){
-
-        cMinion->getGameObject()->setAcceleration( Vector2D( 0.0f, cMinion->getGameObject()->getAcceleration()[1]));
-        cMinion->getGameObject()->setVelocity( Vector2D( (-1.0f)*cMinion->getGameObject()->getVelocity()[0], cMinion->getGameObject()->getVelocity()[1]));
-    }
-
     if (c->getColDir()==Vector2D(0.0f, 1.0f)){
 
-        cMinion->getGameObject()->setAcceleration( Vector2D( cMinion->getGameObject()->getAcceleration()[0], 0));
-        cMinion->getGameObject()->setVelocity( Vector2D( cMinion->getGameObject()->getVelocity()[0], 0));
+//        cMinion->getGameObject()->setAcceleration( Vector2D( cMinion->getGameObject()->getAcceleration()[0], 0));
+//        cMinion->getGameObject()->setVelocity( Vector2D( cMinion->getGameObject()->getVelocity()[0], 0));
+        colMinionBlockDown(cMinion);
     }
 
     if (c->getColDir()==Vector2D(0.0f, -1.0f)){
-        cMinion->getGameObject()->setAcceleration( Vector2D( cMinion->getGameObject()->getAcceleration()[0], GRAVITY));
-        cMinion->getGameObject()->setVelocity( Vector2D( cMinion->getGameObject()->getVelocity()[0], 0));
+//        cMinion->getGameObject()->setAcceleration( Vector2D( cMinion->getGameObject()->getAcceleration()[0], GRAVITY));
+//        cMinion->getGameObject()->setVelocity( Vector2D( cMinion->getGameObject()->getVelocity()[0], 0));
+        colMinionBlockUp(cMinion);
     }
 
+    if (c->getColDir()==Vector2D(1.0f, 0.0f)){
+
+/*        cMinion->getGameObject()->setAcceleration( Vector2D( 0.0f, cMinion->getGameObject()->getAcceleration()[1]));
+        cMinion->getGameObject()->setVelocity( Vector2D( (-1.0f)*cMinion->getGameObject()->getVelocity()[0], cMinion->getGameObject()->getVelocity()[1]));*/
+        colMinionBlockRight(cMinion);
+    }
+
+    if (c->getColDir()==Vector2D(-1.0f, 0.0f)){
+        colMinionBlockLeft(cMinion);
+    }
+
+}
+
+
+void CollisionSystem::colMinionBlockUp(Collider* c){
+
+    if (c->getGameObject()->getVelocity()[1] <= (-1)*c->getGameObject()->getMaxVelocity()[1]) {
+
+        c->getGameObject()->setVelocity( Vector2D( c->getGameObject()->getVelocity()[0], 0.0f));
+
+    }
+    else if (c->getGameObject()->getVelocity()[1] >= 0){
+
+        c->getGameObject()->setAcceleration( Vector2D( c->getGameObject()->getAcceleration()[0], GRAVITY));
+        c->getGameObject()->setVelocity( Vector2D( c->getGameObject()->getVelocity()[0], c->getGameObject()->getVelocity()[1]));
+    }
+}
+
+void CollisionSystem::colMinionBlockDown(Collider* c){
+
+        c->getGameObject()->setAcceleration( Vector2D( c->getGameObject()->getAcceleration()[0], 0));
+        c->getGameObject()->setVelocity( Vector2D( c->getGameObject()->getVelocity()[0], 0.0f));
+
+}
+
+void CollisionSystem::colMinionBlockLeft(Collider* c){
+
+
+    if (c->getGameObject()->getVelocity()[0] <= (-1)*c->getGameObject()->getMaxVelocity()[0]) {
+
+        c->getGameObject()->setVelocity( Vector2D((-1) * c->getGameObject()->getVelocity()[0], c->getGameObject()->getVelocity()[1]));
+
+    }
+    else if (c->getGameObject()->getVelocity()[0] >= 0){
+
+        c->getGameObject()->setAcceleration( Vector2D( 0.0f, c->getGameObject()->getAcceleration()[1]));
+        c->getGameObject()->setVelocity( Vector2D( c->getGameObject()->getVelocity()[0], c->getGameObject()->getVelocity()[1]));
+    }
+
+}
+
+void CollisionSystem::colMinionBlockRight(Collider* c){
+
+    if (c->getGameObject()->getVelocity()[0] >= c->getGameObject()->getMaxVelocity()[0]) {
+
+        c->getGameObject()->setVelocity( Vector2D( (-1) * c->getGameObject()->getVelocity()[0], c->getGameObject()->getVelocity()[1]));
+
+    }
+    else if (c->getGameObject()->getVelocity()[0] <= 0){
+
+        c->getGameObject()->setAcceleration( Vector2D( 0.0f, c->getGameObject()->getAcceleration()[1]));
+        c->getGameObject()->setVelocity( Vector2D( c->getGameObject()->getVelocity()[0], c->getGameObject()->getVelocity()[1]));
+    }
+}
+
+void CollisionSystem::colMinionSpecialBlockUp(Collider* c){
+
+    if (c->getGameObject()->getVelocity()[1] <= (-1)*c->getGameObject()->getMaxVelocity()[1]) {
+
+        c->getGameObject()->setVelocity( Vector2D( c->getGameObject()->getVelocity()[0], 0.0f));
+
+    }
+    else if (c->getGameObject()->getVelocity()[1] >= 0){
+
+        c->getGameObject()->setAcceleration( Vector2D( c->getGameObject()->getAcceleration()[0], GRAVITY));
+        c->getGameObject()->setVelocity( Vector2D( c->getGameObject()->getVelocity()[0], c->getGameObject()->getVelocity()[1]));
+    }
+}
+
+void CollisionSystem::colMinionSpecialBlockDown(Collider* c){
+
+        c->getGameObject()->setAcceleration( Vector2D( c->getGameObject()->getAcceleration()[0], 0));
+        c->getGameObject()->setVelocity( Vector2D( c->getGameObject()->getVelocity()[0], 0.0f));
+
+}
+
+void CollisionSystem::colMinionSpecialBlockLeft(Collider* c){
+
+
+    if (c->getGameObject()->getVelocity()[0] <= (-1)*c->getGameObject()->getMaxVelocity()[0]) {
+
+        c->getGameObject()->setVelocity( Vector2D((-1) * c->getGameObject()->getVelocity()[0], c->getGameObject()->getVelocity()[1]));
+
+    }
+    else if (c->getGameObject()->getVelocity()[0] >= 0){
+
+        c->getGameObject()->setAcceleration( Vector2D( 0.0f, c->getGameObject()->getAcceleration()[1]));
+        c->getGameObject()->setVelocity( Vector2D( c->getGameObject()->getVelocity()[0], c->getGameObject()->getVelocity()[1]));
+    }
+
+}
+
+void CollisionSystem::colMinionSpecialBlockRight(Collider* c){
+
+    if (c->getGameObject()->getVelocity()[0] >= c->getGameObject()->getMaxVelocity()[0]) {
+
+        c->getGameObject()->setVelocity( Vector2D((-1) * c->getGameObject()->getVelocity()[0], c->getGameObject()->getVelocity()[1]));
+
+    }
+    else if (c->getGameObject()->getVelocity()[0] <= 0){
+
+        c->getGameObject()->setAcceleration( Vector2D( 0.0f, c->getGameObject()->getAcceleration()[1]));
+        c->getGameObject()->setVelocity( Vector2D( c->getGameObject()->getVelocity()[0], c->getGameObject()->getVelocity()[1]));
+    }
 }
 
 void CollisionSystem::colMinionMinion(Collision* c) {
     return;
 }
 
-void CollisionSystem::colMinionWater(Collision* c) {
-    return;
-}
+void CollisionSystem::colMinionSpecial(Collision* c) {
 
-void CollisionSystem::colMinionIce(Collision* c) {
-    return;
+    cout<<"collision: minion <-> special"<<endl;
+
+
+    Collider* a = c->getColliderA();
+    Collider* b = c->getColliderB();
+
+    Collider* cMinion = (a->getGameObject()->getTag()=="Minion")?a:b;
+    Collider* cTile = (a->getGameObject()->getTag()=="Minion")?b:a;
+
+    if (c->getColDir()==Vector2D(0.0f, 1.0f)){
+
+//        cMinion->getGameObject()->setAcceleration( Vector2D( cMinion->getGameObject()->getAcceleration()[0], 0));
+//        cMinion->getGameObject()->setVelocity( Vector2D( cMinion->getGameObject()->getVelocity()[0], 0));
+        colMinionSpecialBlockDown(cMinion);
+    }
+
+    if (c->getColDir()==Vector2D(0.0f, -1.0f)){
+//        cMinion->getGameObject()->setAcceleration( Vector2D( cMinion->getGameObject()->getAcceleration()[0], GRAVITY));
+//        cMinion->getGameObject()->setVelocity( Vector2D( cMinion->getGameObject()->getVelocity()[0], 0));
+        colMinionSpecialBlockUp(cMinion);
+    }
+
+    if (c->getColDir()==Vector2D(1.0f, 0.0f)){
+
+/*        cMinion->getGameObject()->setAcceleration( Vector2D( 0.0f, cMinion->getGameObject()->getAcceleration()[1]));
+        cMinion->getGameObject()->setVelocity( Vector2D( (-1.0f)*cMinion->getGameObject()->getVelocity()[0], cMinion->getGameObject()->getVelocity()[1]));*/
+        colMinionSpecialBlockRight(cMinion);
+    }
+
+    if (c->getColDir()==Vector2D(-1.0f, 0.0f)){
+        colMinionSpecialBlockLeft(cMinion);
+    }
 }
 
 
@@ -290,27 +476,24 @@ void CollisionSystem::colMinionBullet(Collision* c) {
 
 void CollisionSystem::colHeroPowerUp(Collision* c) {
 
-    cout<<"collision: hero <-> powerUp"<<endl;
 
     Collider* a = c->getColliderA();
     Collider* b = c->getColliderB();
 
-//    if ((a == NULL) || (b == NULL)){
-//        cout << "cHero or cPowerUp is NULL\n";
-//    }
 
     Collider* cHero = (a->getGameObject()->getTag() == "Hero") ? a : b;
     Collider* cPowerUp = (a->getGameObject()->getTag() == "PowerUp") ? a : b;
 
-//    cout << "PowerUp size : " << GameSetting::getInstance()->getPowerUps().size() << endl;
-//    if (cPowerUp->getGameObject() == NULL){
-//        cout << "PowerUp has no GameObject!\n";
-//    }
-
-//    cout << "PowerUp Collide with Hero Power Code : " << cPowerUp->getGameObject()->getPowerCode() << endl;
-
+    // Collision Effect
+    cHero->getGameObject()->setLastPowerTime(SDL_GetTicks());
     cHero->getGameObject()->setPowerCode(cPowerUp->getGameObject()->getPowerCode());
-    cPowerUp->getGameObject()->setState(IS_DEAD);
+
+
+    if (!cPowerUp->getIsCol()) {          // If powerup is collision valid
+        cPowerUp->setIsCol(true);
+        cPowerUp->setLastColTime(SDL_GetTicks());
+//        SoundSystem::getInstance()->playPowerUpSound();
+    }
 }
 
 
@@ -336,6 +519,10 @@ void CollisionSystem::colPowerUpGround(Collision* c) {
     cPowerUp->getGameObject()->setVelocity( Vector2D( cPowerUp->getGameObject()->getVelocity()[0], 0));
 }
 
+void CollisionSystem::colPowerUpSpecial(Collision* c){
+    return;
+}
+
 void CollisionSystem::colBulletGround(Collision* c) {
 
     cout<<"collision: surface <-> bullet"<<endl;
@@ -348,9 +535,32 @@ void CollisionSystem::colBulletGround(Collision* c) {
     cBullet->getGameObject()->setState(IS_DEAD);
 }
 
+void CollisionSystem::colBulletSpecial(Collision *c){
+    return;
+}
+
+void CollisionSystem::colBulletHero(Collision* c){
+    return;
+}
+
 
 /*************************.    Collision Collection Helper Function  *************************/
 // All this position is relative the map coordinate system, the origin is in the left-top corner
+
+void CollisionSystem::collectHeroCollectibleCol() {
+
+    Hero* hero = GameSetting::getInstance()->getHero();
+
+    vector<Collectible*> collectibles = GameSetting::getInstance()->getCollectibles();
+
+    for (int i=0; i<collectibles.size(); i++) {
+
+        if ( hero->onCollide(collectibles[i])){
+            this->colQueue.push_back(new Collision(hero, collectibles[i]));
+        }
+    }
+}
+
 void CollisionSystem::collectHeroMinionCol() {
 
     Hero* hero = GameSetting::getInstance()->getHero();
@@ -379,6 +589,15 @@ void CollisionSystem::collectHeroGroundCol() {
 
     Tile* CDTile = currTileMap->tileAtDownPos(hero->getPosition());
 
+    if (CUTile != NULL){
+        if (hero->onCollide(CUTile))
+            this->colQueue.push_back(new Collision(hero, CUTile, Vector2D(0.0, -1.0)));
+    }
+
+    if (CDTile != NULL){
+        if (hero->onCollide(CDTile))
+            this->colQueue.push_back(new Collision(hero, CDTile, Vector2D(0.0, 1.0)));
+    }
 
     if (CLTile != NULL){
         if (hero->onCollide(CLTile))
@@ -391,15 +610,7 @@ void CollisionSystem::collectHeroGroundCol() {
             this->colQueue.push_back(new Collision(hero, CRTile, Vector2D(1.0, 0.0)));
     }
 
-    if (CUTile != NULL){
-        if (hero->onCollide(CUTile))
-            this->colQueue.push_back(new Collision(hero, CUTile, Vector2D(0.0, -1.0)));
-    }
 
-    if (CDTile != NULL){
-        if (hero->onCollide(CDTile))
-            this->colQueue.push_back(new Collision(hero, CDTile, Vector2D(0.0, 1.0)));
-    }
 
 
 }
@@ -452,8 +663,10 @@ void CollisionSystem::collectMinionBulletCol() {
 
         for (int j=0; j<bullets.size(); j++) {
 
-            if (minions[i]->onCollide(bullets[j]))
+            if (minions[i]->onCollide(bullets[j])){
+                SoundSystem::getInstance()->playKickSound();
                 this->colQueue.push_back(new Collision(minions[i], bullets[j]));
+            }
         }
     }
 }
@@ -507,6 +720,7 @@ void CollisionSystem::collectHeroPowerUpCol() {
     for (int i=0; i<powerUps.size(); i++) {
 
         if ( hero->onCollide(powerUps[i])){
+//            SoundSystem::getInstance()->playPowerUpSound();
             cout << "Detect that hero collides with powerUp[" << i << "] !\n";
             this->colQueue.push_back(new Collision(hero, powerUps[i]));
         }
@@ -556,10 +770,21 @@ void CollisionSystem::colHeroBlockRight(Collider* cHero, Vector2D* input) {
 
     if ((*input)[0]>0){
         Vector2D* nv = new Vector2D(0.0f, (*input)[1]);
-        ControlSystem::getInstance()->setInput(GameSetting::getInstance()->getPlayerNum()-1,nv);
+        ControlSystem::getInstance()->reset();
     }
-    cHero->getGameObject()->setAcceleration( Vector2D( 0.0f, cHero->getGameObject()->getAcceleration()[1]));
-    cHero->getGameObject()->setVelocity( Vector2D( 0.0f, cHero->getGameObject()->getVelocity()[1]));
+
+    if (cHero->getGameObject()->getVelocity()[0] >= cHero->getGameObject()->getMaxVelocity()[0]) {
+
+        cHero->getGameObject()->setVelocity( Vector2D(0.0f, cHero->getGameObject()->getVelocity()[1]));
+
+    }
+    else if (cHero->getGameObject()->getVelocity()[0] <= 0){
+
+        cHero->getGameObject()->setAcceleration( Vector2D( 0.0f, cHero->getGameObject()->getAcceleration()[1]));
+        cHero->getGameObject()->setVelocity( Vector2D( 0.0f, cHero->getGameObject()->getVelocity()[1]));
+    }
+
+    ControlSystem::getInstance()->setInputFactors( Vector2D(1.0f, 1.0f) );
 
 }
 
@@ -568,8 +793,9 @@ void CollisionSystem::colHeroBlockLeft(Collider* cHero, Vector2D* input) {
 
     if ((*input)[0]<0){
         Vector2D* nv = new Vector2D(0.0f, (*input)[1]);
-        ControlSystem::getInstance()->setInput(GameSetting::getInstance()->getPlayerNum()-1,nv);
+        ControlSystem::getInstance()->reset();
     }
+
 
     if (cHero->getGameObject()->getVelocity()[0] <= (-1)*cHero->getGameObject()->getMaxVelocity()[0]) {
 
@@ -581,15 +807,19 @@ void CollisionSystem::colHeroBlockLeft(Collider* cHero, Vector2D* input) {
         cHero->getGameObject()->setAcceleration( Vector2D( 0.0f, cHero->getGameObject()->getAcceleration()[1]));
         cHero->getGameObject()->setVelocity( Vector2D( 0.0f, cHero->getGameObject()->getVelocity()[1]));
     }
+    ControlSystem::getInstance()->setInputFactors( Vector2D(1.0f, 1.0f) );
+
 }
 
 void CollisionSystem::colHeroBlockDown(Collider* cHero, Vector2D* input) {
 
     //cout<<"^^^^^^^^^^ velocity: "+to_string(cHero->getGameObject()->getVelocity()[0])+", "+to_string(cHero->getGameObject()->getVelocity()[1])<<endl;
 
+    cHero->getGameObject()->setIsFloat(false);
+
     if ((*input)[1]>0){
         Vector2D* nv = new Vector2D((*input)[0], 0.0f);
-        ControlSystem::getInstance()->setInput(GameSetting::getInstance()->getPlayerNum()-1,nv);
+        ControlSystem::getInstance()->reset();
     }
 
     if (cHero->getGameObject()->getVelocity()[1] >= cHero->getGameObject()->getMaxVelocity()[1]) {
@@ -603,6 +833,9 @@ void CollisionSystem::colHeroBlockDown(Collider* cHero, Vector2D* input) {
         cHero->getGameObject()->setVelocity( Vector2D( cHero->getGameObject()->getVelocity()[0], 0.0f));
     }
 
+    ControlSystem::getInstance()->setInputFactors( Vector2D(1.0f, 1.0f) );
+
+
 }
 
 
@@ -611,7 +844,7 @@ void CollisionSystem::colHeroBlockUp(Collider* cHero, Vector2D* input) {
     //cout<<"$$$$$$$$$$$ velocity: "+to_string(cHero->getGameObject()->getVelocity()[0])+", "+to_string(cHero->getGameObject()->getVelocity()[1])<<endl;
     if ((*input)[1]<0){
             Vector2D* nv = new Vector2D((*input)[0], 0.0f);
-            ControlSystem::getInstance()->setInput(GameSetting::getInstance()->getPlayerNum()-1,nv);
+            ControlSystem::getInstance()->reset();
     }
 
     if (cHero->getGameObject()->getVelocity()[1] <= (-1)*cHero->getGameObject()->getMaxVelocity()[1]) {
@@ -630,8 +863,139 @@ void CollisionSystem::colHeroBlockUp(Collider* cHero, Vector2D* input) {
     // Vector2D npos = cHero->getGameObject()->getPosition()+;
 
     // cHero->getGameObject()->setPosition( npos );
+    ControlSystem::getInstance()->setInputFactors( Vector2D(1.0f, 1.0f) );
+
 
 }
+
+void CollisionSystem::colHeroSpecialBlockRight(Collider* cHero, Vector2D* input) {
+
+    if ((*input)[0]>0){
+        Vector2D* nv = new Vector2D(0.0f, (*input)[1]);
+        ControlSystem::getInstance()->reset();
+    }
+    TileMap* currentMap = TileMapSystem::getInstance()->getTileMap( TileMapSystem::getInstance()->getCurrentMapId() );
+    Vector2D specialAccEffect = currentMap->getSpecialAccEffect();
+    Vector2D inputFactorEffect = currentMap->getInputFactorEffect();
+    int specialLifeEffect = currentMap->getSpecialLifeEffect();
+    int currentLife = GameSetting::getInstance()->getLife() - specialLifeEffect;
+    GameSetting::getInstance()->setLife( currentLife );
+
+    if (cHero->getGameObject()->getVelocity()[0] >= cHero->getGameObject()->getMaxVelocity()[0]) {
+
+        cHero->getGameObject()->setVelocity( Vector2D(0.0f, cHero->getGameObject()->getVelocity()[1]));
+
+    }
+    else if (cHero->getGameObject()->getVelocity()[0] >= 0){
+
+        cHero->getGameObject()->setAcceleration( Vector2D( 0.0f, cHero->getGameObject()->getAcceleration()[1]));
+        cHero->getGameObject()->setVelocity( Vector2D( 0.0f, cHero->getGameObject()->getVelocity()[1]));
+    }
+    ControlSystem::getInstance()->setInputFactors( Vector2D(1.0f, 1.0f) );
+
+}
+
+void CollisionSystem::colHeroSpecialBlockLeft(Collider *cHero, Vector2D *input) {
+
+    if ((*input)[0]<0){
+        Vector2D* nv = new Vector2D(0.0f, (*input)[1]);
+        ControlSystem::getInstance()->reset();
+    }
+
+    TileMap* currentMap = TileMapSystem::getInstance()->getTileMap( TileMapSystem::getInstance()->getCurrentMapId() );
+    Vector2D specialAccEffect = currentMap->getSpecialAccEffect();
+    Vector2D inputFactorEffect = currentMap->getInputFactorEffect();
+    int specialLifeEffect = currentMap->getSpecialLifeEffect();
+    int currentLife = GameSetting::getInstance()->getLife() - specialLifeEffect;
+    GameSetting::getInstance()->setLife( currentLife );
+
+    if (cHero->getGameObject()->getVelocity()[0] <= (-1)*cHero->getGameObject()->getMaxVelocity()[0]) {
+
+        cHero->getGameObject()->setVelocity( Vector2D(0.0f, cHero->getGameObject()->getVelocity()[1]));
+
+    }
+    else if (cHero->getGameObject()->getVelocity()[0] <= 0){
+
+        cHero->getGameObject()->setAcceleration( Vector2D( 0.0f, cHero->getGameObject()->getAcceleration()[1]));
+        cHero->getGameObject()->setVelocity( Vector2D( 0.0f, cHero->getGameObject()->getVelocity()[1]));
+    }
+
+    ControlSystem::getInstance()->setInputFactors( Vector2D(1.0f, 1.0f) );
+
+}
+
+void CollisionSystem::colHeroSpecialBlockDown(Collider* cHero, Vector2D* input) {
+
+    //cout<<"^^^^^^^^^^ velocity: "+to_string(cHero->getGameObject()->getVelocity()[0])+", "+to_string(cHero->getGameObject()->getVelocity()[1])<<endl;
+
+    cHero->getGameObject()->setIsFloat(false);
+
+    if ((*input)[1]>0){
+        Vector2D* nv = new Vector2D((*input)[0], 0.0f);
+        ControlSystem::getInstance()->reset();
+    }
+
+    TileMap* currentMap = TileMapSystem::getInstance()->getTileMap( TileMapSystem::getInstance()->getCurrentMapId() );
+
+    Vector2D specialAccEffect = currentMap->getSpecialAccEffect();
+    Vector2D inputFactorEffect = currentMap->getInputFactorEffect();
+    int specialLifeEffect = currentMap->getSpecialLifeEffect();
+
+    int currentLife = GameSetting::getInstance()->getLife() - specialLifeEffect;
+
+    GameSetting::getInstance()->setLife( currentLife );
+
+
+
+    if (cHero->getGameObject()->getVelocity()[1] >= cHero->getGameObject()->getMaxVelocity()[1]) {
+
+        cHero->getGameObject()->setVelocity( Vector2D( cHero->getGameObject()->getVelocity()[0], 0.0f));
+
+    }
+    else if (cHero->getGameObject()->getVelocity()[1] >= 0){
+
+        specialAccEffect[0] = (cHero->getGameObject()->getAcceleration()[0] >= 0)? specialAccEffect[0] : (-specialAccEffect[0]);
+
+        specialAccEffect[1] = (cHero->getGameObject()->getAcceleration()[1] >= 0)? specialAccEffect[1] : (-specialAccEffect[0]);
+
+        cHero->getGameObject()->setAcceleration( Vector2D( cHero->getGameObject()->getAcceleration()[0] + specialAccEffect[0]
+                                                 , 0.0f + specialAccEffect[1]));
+        cHero->getGameObject()->setVelocity( Vector2D( cHero->getGameObject()->getVelocity()[0], 0.0f));
+
+        ControlSystem::getInstance()->setInputFactors( inputFactorEffect );
+    }
+
+}
+
+void CollisionSystem::colHeroSpecialBlockUp(Collider* cHero, Vector2D* input) {
+
+    //cout<<"$$$$$$$$$$$ velocity: "+to_string(cHero->getGameObject()->getVelocity()[0])+", "+to_string(cHero->getGameObject()->getVelocity()[1])<<endl;
+    if ((*input)[1]<0){
+            Vector2D* nv = new Vector2D((*input)[0], 0.0f);
+            ControlSystem::getInstance()->reset();
+    }
+
+    TileMap* currentMap = TileMapSystem::getInstance()->getTileMap( TileMapSystem::getInstance()->getCurrentMapId() );
+    Vector2D specialAccEffect = currentMap->getSpecialAccEffect();
+    Vector2D inputFactorEffect = currentMap->getInputFactorEffect();
+    int specialLifeEffect = currentMap->getSpecialLifeEffect();
+    int currentLife = GameSetting::getInstance()->getLife() - specialLifeEffect;
+    GameSetting::getInstance()->setLife( currentLife );
+
+    if (cHero->getGameObject()->getVelocity()[1] <= (-1)*cHero->getGameObject()->getMaxVelocity()[1]) {
+
+        cHero->getGameObject()->setVelocity( Vector2D( cHero->getGameObject()->getVelocity()[0], 0.0f));
+
+    }
+    else if (cHero->getGameObject()->getVelocity()[1] <= 0){
+
+        cHero->getGameObject()->setAcceleration( Vector2D( cHero->getGameObject()->getAcceleration()[0], GRAVITY));
+        cHero->getGameObject()->setVelocity( Vector2D( cHero->getGameObject()->getVelocity()[0], (-1)*cHero->getGameObject()->getVelocity()[1]));
+    }
+    ControlSystem::getInstance()->setInputFactors( Vector2D(1.0f, 1.0f) );
+
+}
+
 
 // quit
 bool CollisionSystem::quit(){

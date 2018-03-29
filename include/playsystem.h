@@ -7,8 +7,10 @@
 #include "powerup.h"
 #include "hero.h"
 #include "bullet.h"
+#include "collectible.h"
 #include "gamesetting.h"
 #include "controlsystem.h"
+#include "tilemapsystem.h"
 #include <SDL.h>
 
 /**
@@ -31,6 +33,8 @@ public:
      * @brief Initialization
      */
     bool init();
+
+    void initCheckPointList();
     /**
      * @brief Update
      */
@@ -61,8 +65,12 @@ public:
 
     bool        isGameOver();
 
+    bool        isHeroPass();
+
 public:
     void        gameOver();
+
+    void        heroPass();
 
 
 public:
@@ -78,6 +86,8 @@ public:
 
     void        minionVelocityUpdate(Minion* m);
 
+    void        minionsReset();
+
 public:
     void        heroUpdate();
 
@@ -92,6 +102,8 @@ public:
     void        heroPowerUpdate();
 
     void        heroFireUpdate();
+
+    void        heroCheckPointUpdate();
 
     void        heroReset();
 
@@ -114,6 +126,29 @@ public:
 
     void        bulletPositionUpdate(Bullet* b);
 
+    void        bulletPoseUpdate(Bullet* b);
+
+public:
+
+    void        setRecentCheckPoint(Vector2D cp);
+
+    Vector2D    getRecentCheckPoint();
+
+    vector<Vector2D> getCheckedPointList();
+
+public:
+
+    void        collectibleUpdate();
+
+    void        collectiblePoseUpdate(Collectible* p);
+
+    void        collectibleVelocityUpdate(Collectible* p);
+
+    void        collectiblePositionUpdate(Collectible* p);
+
+
+
+
 
 private:
     /** the only instance */
@@ -122,6 +157,13 @@ private:
      * @brief Default Contructor
      */
     PlaySystem();
+
+    Vector2D    recentCheckPoint = Vector2D(0.0f, 0.0f);
+
+    vector<Vector2D> checkedPointList;
+
+    vector<Vector2D> uncheckedPointList;
+
 
     bool winState = false; /**< whether the player wins */
     bool loseState = false; /**< whether the player loses */

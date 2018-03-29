@@ -56,6 +56,8 @@ public:
 
     void colHeroGround(Collision* c);
 
+    void colHeroSpecial(Collision* c);
+
     void colHeroBlockUp(Collider* cHero, Vector2D* input);
 
     void colHeroBlockDown(Collider* cHero, Vector2D* input);
@@ -64,29 +66,64 @@ public:
 
     void colHeroBlockRight(Collider* cHero, Vector2D* input);
 
-    void colHeroWater(Collision* c);
+    void colHeroSpecialBlockUp(Collider* cHero, Vector2D* input);
 
-    void colHeroIce(Collision* c);
+    void colHeroSpecialBlockDown(Collider* cHero, Vector2D* input);
+
+    void colHeroSpecialBlockLeft(Collider* cHero, Vector2D* input);
+
+    void colHeroSpecialBlockRight(Collider* cHero, Vector2D* input);
+
+//    void colHeroWater(Collision* c);
+
+//    void colHeroIce(Collision* c);
 
 
 
     void colMinionGround(Collision* c);
 
-    void colMinionWater(Collision* c);
+    void colMinionSpecial(Collision* c);
 
-    void colMinionIce(Collision* c);
+//    void colMinionWater(Collision* c);
+
+//    void colMinionIce(Collision* c);
 
     void colMinionMinion(Collision* c);
+
+    void colMinionBlockUp(Collider* c);
+
+    void colMinionBlockDown(Collider* c);
+
+    void colMinionBlockLeft(Collider* c);
+
+    void colMinionBlockRight(Collider* c);
+
+    void colMinionSpecialBlockUp(Collider* c);
+
+    void colMinionSpecialBlockDown(Collider* c);
+
+    void colMinionSpecialBlockLeft(Collider* c);
+
+    void colMinionSpecialBlockRight(Collider* c);
 
 
     void colHeroPowerUp(Collision* c);
 
     void colPowerUpGround(Collision* c);
 
+    void colPowerUpSpecial(Collision* c);
+
 
     void colMinionBullet(Collision* c);
 
     void colBulletGround(Collision* c);
+
+    void colBulletSpecial(Collision* c);
+
+    void colBulletHero(Collision* c);
+
+    void colHeroCollectible(Collision* c);
+
 
 
 public:
@@ -116,6 +153,8 @@ public:
     void collectMinionBulletCol();
 
     void collectBulletGroundCol();
+
+    void collectHeroCollectibleCol();
 
 
 

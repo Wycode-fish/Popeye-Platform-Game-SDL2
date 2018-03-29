@@ -22,11 +22,14 @@
 #include "collisionsystem.h"
 #include "controlsystem.h"
 #include "resourcemanager.h"
+#include "passmenu.h"
 #include "constants.h"
 #include "system.h"
 #include "camera.h"
 #include "mainmenu.h"
 #include "pausemenu.h"
+#include "losemenu.h"
+#include "winmenu.h"
 
 #include <string>
 #include <sstream>
@@ -77,22 +80,26 @@ public:
     /**
      * @brief render the lose scene
      */
-    void renderLose();
+    MENU_MESSAGE renderLoseMenu();
     /**
      * @brief render the win scene
      */
-    void renderWin();
+    MENU_MESSAGE renderWinMenu();
     /**
      * @brief render main menu on event
      */
-    bool renderMainMenu();
+    MENU_MESSAGE renderMainMenu();
 
-    bool renderPauseMenu();
+    MENU_MESSAGE renderPauseMenu();
+
+    MENU_MESSAGE renderPassMenu();
 
     /**
      * @brief Update the window at every frame
      */
     void update();
+
+    void updateMapTexture();
     /**
      * @brief Get SDL_Window
      */
@@ -114,6 +121,14 @@ public:
 
     void renderPowerUps();
 
+    void renderInfo();
+
+    bool loadInfoTexture();
+
+    void renderCheckPoints();
+
+    void renderCollectibles();
+
 
 private:
     /**
@@ -125,26 +140,21 @@ private:
     SDL_Window* gWindow = NULL; /**< the window we will be rendering to */
     SDL_Renderer* gRenderer = NULL; /**< SDL Renderer */
 
-    LTexture* gResumeTextTexture = new LTexture(); /**< resume text texture */
-    LTexture* gPauseMenuTexture = new LTexture(); /**< pause menu texture */
-    LTexture* gPauseTextTexture = new LTexture(); /**< pause text texture */
-    LTexture* gQuitTextTexture = new LTexture(); /**< quit text texture */
-    LTexture* gStartTextTexture = new LTexture(); /**< start texture */
-    LTexture* gMainMenuTexture = new LTexture(); /**< main meneu texture */
-
     LTexture* gLifeTextTexture = new LTexture(); /**< life texture */
     LTexture* gScoreTextTexture = new LTexture(); /**< score texture */
     LTexture* gLevelTextTexture = new LTexture(); /**< level texture */
-
-    LTexture* gWinTextTexture = new LTexture(); /**< win scene texture */
-    LTexture* gLoseTextTexture = new LTexture(); /**< lose scene texture */
-
+    LTexture* gStateTextTexture = new LTexture(); /** Power Up State*/
+    LTexture* gPowerUpIconTexture = new LTexture(); /**< PowerUp icon text texture */
+    LTexture* gCheckPointTexture = new LTexture(); /** <CheckPoint texture>*/
 
     LTexture* gMapTexture = new LTexture();
     LTexture* gHeroTexture = new LTexture(); /**< ball texture */
     LTexture* gMinionTexture = new LTexture(); /**< brick texture */
     LTexture* gBulletTexture = new LTexture();
     LTexture* gPowerUpTexture = new LTexture();
+    LTexture* gCollectibleTexture = new LTexture();
+
+
 
     TTF_Font* gFont = NULL; /**< globally used font */
     SDL_Color textColor = { 255, 255, 255, 255 }; /**< set the text color to white */

@@ -11,6 +11,7 @@
 #include <stddef.h>
 #include "gamesetting.h"
 #include "system.h"
+#include "soundsystem.h"
 
 using namespace std;
 /**
@@ -37,7 +38,7 @@ public:
      *
      * @param playerId An integer represents the designated player
      */
-    Vector2D* getInputs(int playerId);
+    vector<Vector2D*>* getInputs(int playerId);
     /**
      * @brief Capture the player input at every frame
      *
@@ -59,6 +60,15 @@ public:
 public:
     void setInput(int pid, Vector2D* v);
 
+    void setInputFactors( Vector2D inputFactors );
+
+    Vector2D* translateInput(int pid);
+
+    void reset();
+
+
+    Vector2D getInputFactors();
+
 private:
     /**
      * @brief private constructor
@@ -71,10 +81,12 @@ private:
     /**
      * @brief playerInputs
      */
-    vector<Vector2D*> playerInputs;
+    vector< vector<Vector2D*>* > playerInputs;
 
     // the bullet status input
     vector<bool> isFireInputs;
+
+    Vector2D inputFactors = Vector2D(1.0f, 1.0f);
 };
 
 #endif // CONTROLSYSTEM_H

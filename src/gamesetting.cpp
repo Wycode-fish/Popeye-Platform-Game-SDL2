@@ -16,37 +16,18 @@ GameSetting::GameSetting(){
 }
 
 
-//void GameSetting::initWall () {
-//
-//    if (!boundary.empty())
-//        boundary.clear();
-//
-//    Wall* top = new Wall( Vector2D( WALL_TOP_INITIAL_POS_X, WALL_TOP_INITIAL_POS_Y ),
-//                         Vector2D( WALL_TOP_INITIAL_WIDTH, WALL_TOP_INITIAL_HEIGHT ),
-//                         Vector2D( WALL_TOP_NORMAL_X, WALL_TOP_NORMAL_Y ) );
-//    Wall* left = new Wall( Vector2D( WALL_LEFT_INITIAL_POS_X, WALL_LEFT_INITIAL_POS_Y ),
-//                          Vector2D( WALL_LEFT_INITIAL_WIDTH, WALL_LEFT_INITIAL_HEIGHT ),
-//                          Vector2D( WALL_LEFT_NORMAL_X, WALL_LEFT_NORMAL_Y ) );
-//    Wall* right = new Wall( Vector2D( WALL_RIGHT_INITIAL_POS_X, WALL_RIGHT_INITIAL_POS_Y ),
-//                           Vector2D( WALL_RIGHT_INITIAL_WIDTH, WALL_RIGHT_INITIAL_HEIGHT ),
-//                           Vector2D( WALL_RIGHT_NORMAL_X, WALL_RIGHT_NORMAL_Y ) );
-//
-//    boundary.push_back( top );
-//    boundary.push_back( left );
-//    boundary.push_back( right );
-//}
-
-
 bool GameSetting::init(){
 
     cout << "Init GameSetting!\n";
-
     hero = new Hero();
 
+    TileMapSystem::getInstance()->setCurrentMapId( 0 );
+
     initMinions();
-    //initWall();
     initPowerUps();
     initBullets();
+    initCollectibles();
+
     level = 1;
     life = 3;
 
@@ -72,7 +53,7 @@ bool GameSetting::initPowerUps(){
         powerUps.clear();
 
     if (!loadPowerUpPosition()) {
-        cout<<"load minion positions failed."<<endl;
+        cout<<"load powerUp positions failed."<<endl;
         return false;
     }
 
@@ -85,6 +66,67 @@ bool GameSetting::initPowerUps(){
     return success;
 }
 
+bool GameSetting::initCollectibles(){
+    bool success = true;
+
+    if( !collectibles.empty() )
+        collectibles.clear();
+
+    if (!loadCollectiblePosition()) {
+        cout<<"load Collectibles positions failed."<<endl;
+        return false;
+    }
+
+    for (int i = 0; i < collectiblePositions.size(); i++) {
+        Collectible* temp = new Collectible();
+        temp->setPosition(collectiblePositions[i]);
+        collectibles.push_back( temp );
+    }
+
+    return success;
+}
+
+bool GameSetting::initHero() {
+    bool success = true;
+
+    hero = new Hero();
+
+    if (! loadHeroPosition()) {
+        cout<<"load hero position failed."<<endl;
+        return false;
+    }
+
+    return success;
+}
+
+bool GameSetting::loadHeroPosition() {
+    bool success = true;
+
+    // Read minion position from file
+    //generate the file path
+//    QString sFile = QApplication::applicationDirPath() + "/Assets/levels/hero/level" + QString::fromStdString(to_string(level)) + ".txt";
+//    string levelFile = sFile.toStdString();
+    string levelFile = "Assets/levels/hero/level" + to_string(level) + ".txt";
+    ifstream fin(levelFile);
+    if (!fin.good()) {
+      level = 0;
+      return false;
+    }
+    string s;
+
+    while (getline(fin,s)) {
+      if ((s == "") || (s.substr(0,1)==" ")) {
+        continue;
+      }
+      size_t pos = s.find(" ");
+      float x = stof(s.substr(0, pos));
+      float y = stof(s.substr(pos+1, string::npos));
+      hero->setPosition(Vector2D(x, y));
+    }
+
+    return success;
+}
+
 // load PowerUp
 bool GameSetting::loadPowerUpPosition(){
     bool success = true;
@@ -92,9 +134,70 @@ bool GameSetting::loadPowerUpPosition(){
     if( !powerUpPositions.empty() )
         powerUpPositions.clear();
 
-    powerUpPositions.push_back( Vector2D( 200.0f, 30.0f ) );
+    // Read powerup position from file
+    //generate the file path
+//    QString sFile = QApplication::applicationDirPath() + "/Assets/levels/powerups/level" + QString::fromStdString(to_string(level)) + ".txt";
+//    string levelFile = sFile.toStdString();
+    
+    string levelFile = "Assets/levels/powerups/level" + to_string(level) + ".txt";
 
-    powerUpPositions.push_back( Vector2D( 800.0f, 40.0f ) );
+    ifstream fin(levelFile);
+    if (!fin.good()) {
+      level = 0;
+      return false;
+    }
+    string s;
+
+    while (getline(fin,s)) {
+      if ((s == "") || (s.substr(0,1)==" ")) {
+        continue;
+      }
+      size_t pos = s.find(" ");
+      float x = stof(s.substr(0, pos));
+      float y = stof(s.substr(pos+1, string::npos));
+      powerUpPositions.push_back(Vector2D(x, y));
+    }
+
+    // powerUpPositions.push_back( Vector2D( 200.0f, 30.0f ) );
+
+    // powerUpPositions.push_back( Vector2D( 800.0f, 40.0f ) );
+
+    return success;
+}
+
+bool GameSetting::loadCollectiblePosition() {
+
+     bool success = true;
+
+    if( !collectiblePositions.empty() )
+        collectiblePositions.clear();
+
+    // Read collectible position from file
+    //generate the file path
+//    QString sFile = QApplication::applicationDirPath() + "/Assets/levels/collectibles/level" + QString::fromStdString(to_string(level)) + ".txt";
+//    string levelFile = sFile.toStdString();
+    string levelFile = "Assets/levels/collectibles/level" + to_string(level) + ".txt";
+
+    ifstream fin(levelFile);
+    if (!fin.good()) {
+      level = 0;
+      return false;
+    }
+    string s;
+
+    while (getline(fin,s)) {
+      if ((s == "") || (s.substr(0,1)==" ")) {
+        continue;
+      }
+      size_t pos = s.find(" ");
+      float x = stof(s.substr(0, pos));
+      float y = stof(s.substr(pos+1, string::npos));
+      collectiblePositions.push_back(Vector2D(x, y));
+    }
+
+    // collectiblePositions.push_back( Vector2D( 160.0f, 30.0f ) );
+
+    // collectiblePositions.push_back( Vector2D( 200.0f, 40.0f ) );
 
     return success;
 }
@@ -104,27 +207,31 @@ bool GameSetting::loadMinionPosition() {
         minionPositions.clear();
 
     // Read minion position from file
-    // string levelFile = "Assets/levels/level" + to_string(level) + ".txt";
-    // ifstream fin(levelFile);
-    // if (!fin.good()) {
-    //   level = 0;
-    //   return false;
-    // }
-    // string s;
+    //generate the file path
+//    QString sFile = QApplication::applicationDirPath() + "/Assets/levels/minions/level" + QString::fromStdString(to_string(level)) + ".txt";
+//    string levelFile = sFile.toStdString();
+    string levelFile = "Assets/levels/minions/level" + to_string(level) + ".txt";
 
-    // while (getline(fin,s)) {
-    //   if ((s == "") || (s.substr(0,1)==" ")) {
-    //     continue;
-    //   }
-    //   size_t pos = s.find(" ");
-    //   float x = stof(s.substr(0, pos));
-    //   float y = stof(s.substr(pos+1, string::npos));
-    //   minionPositions.push_back(Vector2D(x, y));
-    // }
+    ifstream fin(levelFile);
+    if (!fin.good()) {
+      level = 0;
+      return false;
+    }
+    string s;
 
-    minionPositions.push_back(Vector2D(120.0f, 40.0f));
+    while (getline(fin,s)) {
+      if ((s == "") || (s.substr(0,1)==" ")) {
+        continue;
+      }
+      size_t pos = s.find(" ");
+      float x = stof(s.substr(0, pos));
+      float y = stof(s.substr(pos+1, string::npos));
+      minionPositions.push_back(Vector2D(x, y));
+    }
 
-    minionPositions.push_back(Vector2D(240.0f, 40.0f));
+    // minionPositions.push_back(Vector2D(120.0f, 40.0f));
+
+    // minionPositions.push_back(Vector2D(240.0f, 40.0f));
 
     return true;
 }
@@ -163,14 +270,18 @@ vector<PowerUp*> GameSetting::getPowerUps(){
     return this->powerUps;
 }
 
+vector<Collectible*> GameSetting::getCollectibles(){
+    return this->collectibles;
+}
+
 
 //vector<Wall*> GameSetting::getBoundary(){
 //    return this->boundary;
 //}
 
-//long int GameSetting::getScore(){
-//    return this->score;
-//}
+long int GameSetting::getScore(){
+    return this->score;
+}
 
 int GameSetting::getLife(){
     return this->life;
@@ -199,9 +310,9 @@ void GameSetting::setLevel( int level ){
     this->level = level;
 }
 
-//void GameSetting::setScore( long int score ){
-//    this->score = score;
-//}
+void GameSetting::setScore( long int score ){
+    this->score = score;
+}
 
 void GameSetting::setLife( int life ){
     this->life = life;
@@ -217,12 +328,18 @@ void GameSetting::update(){
     // Now do nothing
 }
 
-void GameSetting::resetHero(){
+void GameSetting::resetHero(Vector2D checkPoint){
     hero = new Hero();
+    hero->setPosition(checkPoint);
 }
 
 bool GameSetting::isWinConditionsSatisfied () {
-    return (hero->getPosition()[0] >= MAP_WIDTH - 100) && (level == MAXIMUM_LEVEL);
+    TileMap* currentMap = TileMapSystem::getInstance()->getTileMap( TileMapSystem::getInstance()->getCurrentMapId() );
+    int mapWidth = currentMap->getWidth() * currentMap->getTileWidth();
+    Vector2D passPoint = currentMap->getPassPoint();
+    Vector2D heroPos = hero->getPosition();
+    float dist = sqrt( pow((heroPos[0] - passPoint[0]), 2.0) + pow( (heroPos[1] - passPoint[1]), 2.0 ) );
+    return (dist <= TILE_INITIAL_WIDTH) && (level == MAXIMUM_LEVEL);
 }
 
 void GameSetting::removeMinionByIdx (int i) {
@@ -289,3 +406,42 @@ void GameSetting::removeDeadPowerUps(){
     powerUps.clear();
     powerUps.assign(temp.begin(), temp.end());
 }
+
+void GameSetting::initNextLevel(){
+    // hero = new Hero();
+
+    level++;
+
+    initHero();
+    initMinions();
+    initPowerUps();
+    initBullets();
+    initCollectibles();
+
+    // level++;
+}
+
+void GameSetting::initCurrentLevel(){
+    // hero = new Hero();
+
+    initHero();
+    initMinions();
+    initPowerUps();
+    initBullets();
+
+    life = 3;
+}
+
+
+void GameSetting::removeDeadCollectibles(){
+    vector<Collectible*> temp;
+    for (int i = 0; i < collectibles.size(); i++){
+        if (collectibles[i]->getState())
+            temp.push_back(collectibles[i]);
+    }
+
+    collectibles.erase(collectibles.begin(), collectibles.end());
+    collectibles.clear();
+    collectibles.assign(temp.begin(), temp.end());
+}
+

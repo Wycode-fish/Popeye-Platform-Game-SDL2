@@ -1,9 +1,10 @@
-# Platformer - SDL
+# NinjaGo! Platformer - SDL
 
 
-## Test Video Link
+## Intro
 
-https://www.youtube.com/watch?v=-vvl9IDg0vU
+Youtube: https://www.youtube.com/watch?v=91dlGMSSYlQ
+Intro Page: https://www.games.eason.space/ninja-go
 
 ## Part 1
 
@@ -21,4 +22,8 @@ Component Systems Design
     
 - Game Objects:
     Hero / Minion / PowerUp / Tile
-
+    
+## Run
+Currently it can be run on Mac system,
+1. run 'python macbuild.py'
+2. run './Game/pop'

@@ -107,6 +107,13 @@ std::map<std::string, std::string> ResourceManager::loadLanguagePack(std::string
 }
 
 bool ResourceManager::loadLanguageResource() {
+//    QString sEnFile = QApplication::applicationDirPath() + "/Assets/languages/english.txt";
+//
+//    QString sChFile = QApplication::applicationDirPath() + "/Assets/languages/chinese.txt";
+//
+//    std::map<std::string, std::string> en2enMap = loadLanguagePack(sEnFile.toStdString());
+//    std::map<std::string, std::string> en2cnMap = loadLanguagePack(sChFile.toStdString());
+    
     std::map<std::string, std::string> en2enMap = loadLanguagePack("Assets/languages/english.txt");
     std::map<std::string, std::string> en2cnMap = loadLanguagePack("Assets/languages/chinese.txt");
     languageMaps.insert(std::pair< std::string, std::map<std::string, std::string> >("english", en2enMap));
@@ -139,6 +146,8 @@ bool ResourceManager::init(SDL_Renderer* renderer){
     
     
     loadLanguageResource();
+
+    loadTileMapResource();
     
     if (CURRENT_LANGUAGE==LANGUAGE_CHINESE)
     ResourceManager::setCurrentLanguageMap("chinese");
@@ -153,31 +162,54 @@ bool ResourceManager::init(SDL_Renderer* renderer){
     //                             loadTextureResource(renderer, "minion.png", "texture_minion") &&
     //                             loadTextureResource(renderer, "Assets/images/powerup.png", "texture_powerup") &&
     //                             loadTextureResource(renderer, "Assets/images/bullet.png", "texture_bullet");
-    bool texture_load_success = loadTextureResource(renderer, "Assets/images/hero.png", "texture_hero") &&
-    loadTextureResource(renderer, "Assets/maps/res/test2.png", "texture_map") &&
+    bool texture_load_success = loadTextureResource(renderer, "Assets/images/hero_final.png", "texture_hero") &&
+    loadTextureResource(renderer, "Assets/maps/res/snowscene.png", "texture_map_snowscene") &&
+    loadTextureResource(renderer, "Assets/maps/res/kungfu.png", "texture_map_kungfu") &&
+    loadTextureResource(renderer, "Assets/maps/res/old_castle.png", "texture_map_old_castle") &&
     loadTextureResource(renderer, "Assets/images/minions.png", "texture_minion") &&
-    loadTextureResource(renderer, "Assets/images/powerups.png", "texture_powerup") &&
-    loadTextureResource(renderer, "Assets/images/bullets.png", "texture_bullet") &&
+    loadTextureResource(renderer, "Assets/images/powerup_test_2.png", "texture_powerup") &&
+    loadTextureResource(renderer, "Assets/images/bullet_blade.png", "texture_bullet") &&
+    loadTextureResource(renderer, "Assets/images/collectible.png", "texture_collectible") &&
     loadTextureResource(renderer, "Assets/menus/blueSheet.png", "texture_setting_menu_button_sprite_sheet") &&
     loadTextureResource(renderer, "Assets/menus/blueSheet.png", "texture_main_menu_button_sprite_sheet") &&
     loadTextureResource(renderer, "Assets/menus/blueSheet.png", "texture_instruction_menu_button_sprite_sheet")&&
-    loadTextureResource(renderer, "Assets/menus/blueSheet.png", "texture_pass_menu_button_sprite_sheet");
+    loadTextureResource(renderer, "Assets/menus/blueSheet.png", "texture_pass_menu_button_sprite_sheet") &&
+    loadTextureResource(renderer, "Assets/menus/blueSheet.png", "texture_pause_menu_button_sprite_sheet") &&
+    loadTextureResource(renderer, "Assets/menus/blueSheet.png", "texture_lose_menu_button_sprite_sheet") &&
+    loadTextureResource(renderer, "Assets/menus/blueSheet.png", "texture_win_menu_button_sprite_sheet") &&
+    loadTextureResource(renderer, "Assets/images/powerUpIcon.png", "texture_powerup_icon") &&
+    loadTextureResource(renderer, "Assets/images/checkPoint.png", "texture_check_point");
+
     if (!texture_load_success) printf("texture loading error.\n");
     
      //load fonts.
      bool font_load_success = loadTureTypeFontResource(renderer, "Assets/fonts/chinese.ttf", 30, "font_main");
      if (!font_load_success) printf("font loading error.\n");
     
-    // load music.
-    // bool music_load_success = loadMixMusicResource( "../Assets/music/background.mp3", "music_background" );
-    // if (!music_load_success) printf("music loading error.\n");
+     //load music.
+     bool music_load_success = loadMixMusicResource( "Assets/music/kungfu.mp3", "kungfu_background" ) &&
+             loadMixMusicResource( "Assets/music/mainmenu.mp3", "mainmenu_background" ) &&
+             loadMixMusicResource( "Assets/music/snowscene.mp3", "snowscene_background" ) &&
+             loadMixMusicResource( "Assets/music/oldcastle.mp3", "oldcastle_background" );
+
+     if (!music_load_success) printf("music loading error.\n");
     
     // load sound effects.
-    // bool sound_load_success =
-    // loadChunkResource("../Assets/sound/GameOver_SFX.mp3", "sound_gameover") &&
-    // loadChunkResource("../Assets/sound/BrickHit_SFX.mp3", "sound_ball_hit_brick") &&
-    // loadChunkResource("../Assets/sound/PaddleBorderHit_SFX.mp3", "sound_paddle_hit_border");
-    // if (!sound_load_success) printf("sound loading error.\n");
+     bool sound_load_success = loadChunkResource("Assets/sound/passSound.wav", "pass_sound") &&
+             loadChunkResource("Assets/sound/FireSound.wav", "fire_sound") &&
+             loadChunkResource("Assets/sound/PowerUpSound2.mp3", "powerup_sound") &&
+             loadChunkResource("Assets/sound/WinSound.wav", "win_sound") &&
+             loadChunkResource("Assets/sound/JumpSound.mp3", "jump_sound") &&
+             loadChunkResource("Assets/sound/LoseSound.wav", "lose_sound") &&
+             loadChunkResource("Assets/sound/CollectibleSound.wav", "collectible_sound")&&
+             loadChunkResource("Assets/sound/KickSound.wav", "kick_sound") &&
+             loadChunkResource("Assets/sound/CheckPointSound.wav", "check_point_sound");
+
+
+
+//             loadChunkResource("../Assets/sound/PowerUpSound2.mp3", "powerup_sound");
+
+     if (!sound_load_success) printf("sound loading error.\n");
     
     std::cout << "ResourceManager Init ! \n";
     
@@ -261,5 +293,91 @@ bool ResourceManager::quit(){
     Mix_Quit();
     IMG_Quit();
     SDL_Quit();
+    return success;
+}
+
+string ResourceManager::getCurrentWorkingDirectory(void)
+{
+    char path[1024];
+    getcwd(path, sizeof(path));
+    string str(path);
+    return str;
+}
+
+bool ResourceManager::loadTileMapResource(){
+    /******     For TileMap Initialization      *****/
+    bool success = true;
+    {
+        //generate the file path
+//        QString sFile = QApplication::applicationDirPath() + "/Assets/maps/info/snowscene.txt";
+//        string fileName = sFile.toStdString();
+        string fileName = "";
+        fileName = fileName + getCurrentWorkingDirectory() + "/" + "assets/maps/info/snowscene.txt";
+        cout << "File Directory : " << fileName << endl;
+        //fileName = "../Assets/maps/info/snowscene.txt";
+        int groundIndexArray[] = {0, 1, 21, 22, 23};
+        int specialIndexArray[] = {2};
+        int checkPointArray[] = {7, 8};
+        vector<int> groundIndexSet (groundIndexArray, groundIndexArray + sizeof(groundIndexArray) / sizeof(int));
+        vector<int> specialIndexSet (specialIndexArray, specialIndexArray + sizeof(specialIndexArray) / sizeof(int));
+        vector<int> checkPointList (checkPointArray, checkPointArray + sizeof(checkPointArray) / sizeof(int));
+        TileMapSystem::getInstance()->onLoad( fileName,
+                                              groundIndexSet,
+                                              specialIndexSet,
+                                              MAP_TYPE_NORMAL,
+                                              Vector2D(0.0f, 0.0f),
+                                              Vector2D(0.2f, 1.0f),
+                                              0,
+                                              checkPointList,
+                                              Vector2D( 3532.5, 337.5 ));
+    }
+
+    {
+        //generate the file path
+//        QString sFile = QApplication::applicationDirPath() + "/Assets/maps/info/kungfu.txt";
+//        string fileName = sFile.toStdString();
+        string fileName = "";
+        fileName = fileName + getCurrentWorkingDirectory() + "/" + "assets/maps/info/kungfu.txt";
+        cout << "File Directory : " << fileName << endl;
+        int groundIndexArray[] = {18, 19, 20, 21};
+        int specialIndexArray[] = {};
+        int checkPointArray[] = {9, 10, 11};
+        vector<int> groundIndexSet (groundIndexArray, groundIndexArray + sizeof(groundIndexArray) / sizeof(int));
+        vector<int> specialIndexSet (specialIndexArray, specialIndexArray + sizeof(specialIndexArray) / sizeof(int));
+        vector<int> checkPointList (checkPointArray, checkPointArray + sizeof(checkPointArray) / sizeof(int));
+        TileMapSystem::getInstance()->onLoad( fileName,
+                                              groundIndexSet,
+                                              specialIndexSet,
+                                              MAP_TYPE_NORMAL,
+                                              Vector2D(0.0f, 0.0f),
+                                              Vector2D(1.0f, 1.0f),
+                                              0,
+                                              checkPointList,
+                                              Vector2D( 3577.5, 382.5 ));
+    }
+
+    {
+        //generate the file path
+//        QString sFile = QApplication::applicationDirPath() + "/Assets/maps/info/old_castle.txt";
+//        string fileName = sFile.toStdString();
+        string fileName = "";
+        fileName = fileName + getCurrentWorkingDirectory() + "/" + "assets/maps/info/old_castle.txt";
+        cout << "File Directory : " << fileName << endl;
+        int groundIndexArray[] = {0, 1};
+        int specialIndexArray[] = {11};
+        int checkPointArray[] = {2, 3};
+        vector<int> groundIndexSet (groundIndexArray, groundIndexArray + sizeof(groundIndexArray) / sizeof(int));
+        vector<int> specialIndexSet (specialIndexArray, specialIndexArray + sizeof(specialIndexArray) / sizeof(int));
+        vector<int> checkPointList (checkPointArray, checkPointArray + sizeof(checkPointArray) / sizeof(int));
+        TileMapSystem::getInstance()->onLoad( fileName,
+                                              groundIndexSet,
+                                              specialIndexSet,
+                                              MAP_TYPE_NORMAL,
+                                              Vector2D(0.0f, 0.0f),
+                                              Vector2D(1.0f, 1.0f),
+                                              1,
+                                              checkPointList,
+                                              Vector2D( 112.5 , 652.5 ));
+    }
     return success;
 }

@@ -125,20 +125,61 @@ void MainMenu::show(){
                 }
             }
         }
+        render();
+    }
+}
 
-        SDL_SetRenderDrawColor(gRenderer, 0x22,0x22,0x22,0xFF);
-        SDL_RenderClear(gRenderer);
+void MainMenu::render(){
+    SDL_SetRenderDrawColor(gRenderer, 0x22,0x22,0x22,0xFF);
+    SDL_RenderClear(gRenderer);
 
-        for (std::map<std::string, LButton*>::iterator it = buttons.begin();
-             it != buttons.end();
-             it++){
-            LButton* renderButton = it->second;
-            renderButton->render( gMainMenuButtonSpriteSheet, gRenderer, gSpriteClips[ renderButton->getCurrentSprite() ] );
-        }
+    renderBackGround();
 
-        renderLabels();
+    renderButtons();
 
-        SDL_RenderPresent( gRenderer );
+    renderLabels();
+
+
+
+    SDL_RenderPresent( gRenderer );
+}
+
+void MainMenu::renderBackGround(){
+    LTexture* gHeroTexture = ResourceManager::getInstance()->getTextureResource("texture_hero");
+    LTexture* gBackGroundTexture = ResourceManager::getInstance()->getTextureResource("texture_map_kungfu");
+    SDL_Rect clip;
+    clip.x = 750.0f;
+    clip.y = 0.0f;
+    clip.w = WINDOW_WIDTH;
+    clip.h = WINDOW_HEIGHT;
+    gBackGroundTexture->render(0.0f, 0.0f,
+                               gRenderer,
+                               &clip);
+
+    SDL_Rect hClip;
+    hClip.x = 150.0f;
+    hClip.y = 400.0f;
+    hClip.w = 75.0f;
+    hClip.h = 80.0f;
+    SDL_Rect hShrink;
+    hShrink.x = 0.0f;
+    hShrink.y = 0.0f;
+    hShrink.w = HERO_WIDTH_INITIAL * 2.0f;
+    hShrink.h = HERO_HEIGHT_INITIAL * 2.0f;
+    gHeroTexture->render(HERO_BACKGROUND_POSITION_X,
+                         HERO_BACKGROUND_POSITION_Y,
+                         gRenderer,
+                         &hClip,
+                         &hShrink);
+}
+
+void MainMenu::renderButtons(){
+
+    for (std::map<std::string, LButton*>::iterator it = buttons.begin();
+         it != buttons.end();
+         it++){
+        LButton* renderButton = it->second;
+        renderButton->render( gMainMenuButtonSpriteSheet, gRenderer, gSpriteClips[ renderButton->getCurrentSprite() ] );
     }
 }
 

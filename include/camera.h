@@ -4,6 +4,7 @@
 #include "vector2d.h"
 #include "gamesetting.h"
 #include "constants.h"
+#include "tilemapsystem.h"
 
 class Camera {
 

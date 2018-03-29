@@ -16,16 +16,9 @@ MainProgram::~MainProgram(){
 
 }
 
-string MainProgram::getCurrentWorkingDirectory(void)
-{
-    char path[1024];
-    getcwd(path, sizeof(path));
-    string str(path);
-    return str;
-}
-
 void MainProgram::run(){
     if (init()){
+//        Mix_PlayMusic( ResourceManager::getInstance()->getMixMusicResource("music_background"), -1 );
         loop();
     } else {
         cout << "Main Program Init Failure!\n";
@@ -56,8 +49,17 @@ void MainProgram::loop(){
     {
         if (countedFrames == 0){
             GameSetting::getInstance()->reset();
-            if ( !DisplaySystem::getInstance()->renderMainMenu() )
+            SoundSystem::getInstance()->playMainMenuBackground();
+            switch (DisplaySystem::getInstance()->renderMainMenu()) {
+            case MENU_QUIT:{
                 running = false;
+                break;
+            }
+            default:{
+                SoundSystem::getInstance()->start();
+                break;
+            }
+            }
         }
         // FPS capping
         capTimer.start();
@@ -76,15 +78,31 @@ void MainProgram::loop(){
                 else if (event.key.keysym.sym == SDLK_SPACE){
                     //SDL_PollEvent( &event );
                     cout << "Main Program space key down!\n";
-                    if ( !DisplaySystem::getInstance()->renderPauseMenu() ){
+                    switch (DisplaySystem::getInstance()->renderPauseMenu()) {
+                    case MENU_QUIT:{
                         running = false;
+                        break;
+                    }
+                    case MENU_RETURN:{
+                        countedFrames = -1;
+                        break;
+                    }
+                    default:
                         break;
                     }
                 } else if (event.key.keysym.sym == SDLK_ESCAPE){
                     countedFrames = -1;
                 }
                 else ControlSystem::getInstance()->update(event);
+                break;
+            default:
+                ControlSystem::getInstance()->update(event);
             }
+        }
+
+        if (countedFrames == -1){
+            countedFrames++;
+            continue;
         }
 
         CollisionSystem::getInstance()->update();
@@ -99,14 +117,62 @@ void MainProgram::loop(){
         DisplaySystem::getInstance()->update();
         cout << "DisplaySystem update!\n";
 
+        SoundSystem::getInstance()->update();
+        cout << "SoundSystem update!\n";
 
         /******     Win/Lose Check      *****/
         if (PlaySystem::getInstance()->isLose()) {
-            GameSetting::getInstance()->init();
-            PlaySystem::getInstance()->reset();
+//            GameSetting::getInstance()->init();
+//            PlaySystem::getInstance()->reset();
+            SoundSystem::getInstance()->pauseCurrentLevelBackground();
+            SoundSystem::getInstance()->playLoseSound();
+            switch (DisplaySystem::getInstance()->renderLoseMenu()) {
+            case MENU_QUIT:{
+                running = false;
+                break;
+            }
+            case MENU_RETURN:{
+                countedFrames = -1;
+                PlaySystem::getInstance()->reset();
+                break;
+            }
+            default:{
+                GameSetting::getInstance()->initCurrentLevel();
+                PlaySystem::getInstance()->reset();
+                SoundSystem::getInstance()->resumeCurrentLevelBackground();
+                break;
+            }
+            }
         }
         if ( PlaySystem::getInstance()->isWin() ){
+//            GameSetting::getInstance()->init();
+            SoundSystem::getInstance()->pauseCurrentLevelBackground();
+            SoundSystem::getInstance()->playWinSound();
             PlaySystem::getInstance()->reset();
+            switch (DisplaySystem::getInstance()->renderWinMenu()) {
+            case MENU_RETURN:{
+                countedFrames = -1;
+                break;
+            }
+            case MENU_QUIT:{
+                running = false;
+                break;
+            }
+            default:
+                break;
+            }
+        }
+        if ( PlaySystem::getInstance()->isHeroPass() ){
+            SoundSystem::getInstance()->pauseCurrentLevelBackground();
+            SoundSystem::getInstance()->playPassSound();
+            switch (DisplaySystem::getInstance()->renderPassMenu()) {
+            case MENU_QUIT:{
+                running = false;
+                break;
+            }
+            default:
+                break;
+            }
         }
 
 
@@ -123,13 +189,6 @@ void MainProgram::loop(){
 }
 
 bool MainProgram::init(){
-
-    /******     For TileMap Initialization      *****/
-    string fileName = "";
-    fileName = fileName + getCurrentWorkingDirectory() + "/" + "assets/maps/info/test2.txt";
-    int groundIndexArray[] = {0, 2};
-    vector<int> groundIndexSet (groundIndexArray, groundIndexArray + sizeof(groundIndexArray) / sizeof(int));
-    TileMapSystem::getInstance()->onLoad( fileName, groundIndexSet, MAP_TYPE_NORMAL );
 
 
     /******     Component Systems Initialization      *****/
@@ -148,11 +207,7 @@ bool MainProgram::init(){
         cout << "ControlSystem init failed!\n";
         return -1;
     }
-    bool ps = PlaySystem::getInstance()->init();
-    if (!ps){
-        cout << "PlaySystem init failed!\n";
-        return -1;
-    }
+
     bool cos = CollisionSystem::getInstance()->init();
     if (!cos){
         cout << "CollisionSystem init failed!\n";
@@ -163,6 +218,17 @@ bool MainProgram::init(){
         cout << "DisplaySystem init failed!\n";
         return -1;
     }
+    bool ps = PlaySystem::getInstance()->init();
+    if (!ps){
+        cout << "PlaySystem init failed!\n";
+        return -1;
+    }
 
-    return rm && gs && cs && ps && cos && ds;
+    bool ss = SoundSystem::getInstance()->init();
+    if (!ss){
+        cout << "SoundSystem init failed!\n";
+        return -1;
+    }
+
+    return rm && gs && cs && ps && cos && ds && ss;
 }

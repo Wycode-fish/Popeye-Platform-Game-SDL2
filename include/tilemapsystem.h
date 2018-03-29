@@ -1,10 +1,11 @@
 #ifndef TILEMAPSYSTEM_H
 #define TILEMAPSYSTEM_H
 
-
 #include "tilemap.h"
 #include "system.h"
 #include <fstream>
+#include <unistd.h>
+
 using namespace std;
 
 // This class represents the tilemap manager
@@ -14,7 +15,12 @@ class TileMapSystem : public System {
 public:
     static TileMapSystem* getInstance();
     ~TileMapSystem();
-    bool onLoad( const string& fileName, vector<int> groundIndexSet, int mapType );
+    bool onLoad( const string& fileName, vector<int> groundIndexSet, vector<int> specialIndexSet, int mapType,
+                 Vector2D specialEffect,
+                 Vector2D inputFactorEffect,
+                 int specialLifeEffect,
+                 vector<int> checkPointList,
+                 Vector2D passPoint );
     TileMap* getTileMap( int mapId );
     void setCurrentMapId( int currentMapId );
     int getCurrentMapId();

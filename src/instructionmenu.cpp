@@ -115,19 +115,27 @@ void InstructionMenu::show(){
             }
         }
 
-        SDL_SetRenderDrawColor(gRenderer, 0x22,0x22,0x22,0xFF);
-        SDL_RenderClear(gRenderer);
+        render();
+    }
+}
 
-        for (std::map<std::string, LButton*>::iterator it = buttons.begin();
-             it != buttons.end();
-             it++){
-            LButton* renderButton = it->second;
-            renderButton->render( gInstructionMenuButtonSpriteSheet, gRenderer, gSpriteClips[ renderButton->getCurrentSprite() ] );
-        }
+void InstructionMenu::render(){
+    SDL_SetRenderDrawColor(gRenderer, 0x22,0x22,0x22,0xFF);
+    SDL_RenderClear(gRenderer);
 
-        renderLabels();
+    renderButtons();
 
-        SDL_RenderPresent( gRenderer );
+    renderLabels();
+
+    SDL_RenderPresent( gRenderer );
+}
+
+void InstructionMenu::renderButtons(){
+    for (std::map<std::string, LButton*>::iterator it = buttons.begin();
+         it != buttons.end();
+         it++){
+        LButton* renderButton = it->second;
+        renderButton->render( gInstructionMenuButtonSpriteSheet, gRenderer, gSpriteClips[ renderButton->getCurrentSprite() ] );
     }
 }
 
